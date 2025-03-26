@@ -24,6 +24,5 @@ def next(n):
 sequences = {}
 for n in open("input.txt"):
     sim(int(n),2000) 
-    print(n)
 
 print(max([sum(sequence) for sequence in sequences. values()]))
