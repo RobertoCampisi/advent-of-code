@@ -25,4 +25,4 @@ sequences = {}
 for n in open("input.txt"):
     sim(int(n),2000) 
 
-print(max([sum(sequence) for sequence in sequences. values()]))
+print(max([sum(sequence) for sequence in sequences.values()]))
