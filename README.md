@@ -2,7 +2,7 @@
 
 [![Advent of Code](https://img.shields.io/badge/Advent%20of%20Code-ffff66?logo=adventofcode&logoColor=000)](<https://adventofcode.com/> "Advent of Code homepage")
 [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](<https://python.org> "Go to Python homepage")
-![Last commit](https://img.shields.io/github/last-commit/jromero132/advent-of-code "Last commit")
+![Last commit](https://img.shields.io/github/last-commit/Flizz95/advent-of-code "Last commit")
 
 # advent-of-code
 My personal solutions written in python for the yearly Advent of Code coding challenges.
