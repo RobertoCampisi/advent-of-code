@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 keys = []
 locks = []
 for c in open("input.txt").read().split("\n\n"):
