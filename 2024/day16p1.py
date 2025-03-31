@@ -6,8 +6,6 @@ with open('example.txt') as f:
     for j,row in enumerate(input.split('\n')):
         for i,ch in enumerate(list(row)):
             maze[i+j*1j] = 1 if ch == '#' else 0
-#directions: E, S, W, N
-directions = [(0,1),(1,0),(0,-1),(-1,0)]
 
 start = 1+(h-2)*1j
 end = (w-2)+1j
