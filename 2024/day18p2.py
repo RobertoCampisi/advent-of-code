@@ -64,10 +64,12 @@ with open("input.txt",'r') as f:
     for byte in bytes[:1024]:
         x,y = map(int,byte.split(","))
         memory[x+y*1j] = 1
+    path = astar(memory, start, end)#path to start with, known to succeed in part 1
     for byte in bytes[1024:]:
         x,y = map(int,byte.split(","))
         memory[x+y*1j] = 1
-        path = astar(memory, start, end)
+        if x+y*1j in path: #only recalculate if the path has changed
+            path = astar(memory, start, end)
         if path is None:
-            print(x,',',y)
+            print(str(x)+','+str(y))
             break
