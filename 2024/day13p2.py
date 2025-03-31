@@ -18,13 +18,13 @@ def solve(a,b,c):
                     i[j+1]+=i[0]*workspace[-1][j]
             i.pop(0)
     workspace.reverse()
-    an=[workspace[0][0]]
+    ans=[workspace[0][0]]
     for i in range(1,len(workspace)):
         tmpans=workspace[i][-1]
         for j in range(len(workspace[i])-1):
-            tmpans+=workspace[i][j]*an[-1-j]
-        an.append(tmpans)
-    return round(an[1]) * 3 + round(an[0]) if abs(an[0] - round(an[0])) < 0.001 and abs(an[1] - round(an[1])) < 0.001 else 0
+            tmpans+=workspace[i][j]*ans[-1-j]
+        ans.append(tmpans)
+    return round(ans[1]) * 3 + round(ans[0]) if abs(ans[0] - round(ans[0])) < 0.001 and abs(ans[1] - round(ans[1])) < 0.001 else 0
 
 machines = open("input.txt").read().split('\n\n')
 minimum_tokens = 0
