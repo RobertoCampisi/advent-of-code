@@ -24,8 +24,7 @@ def solve(a,b,c):
         for j in range(len(workspace[i])-1):
             tmpans+=workspace[i][j]*an[-1-j]
         an.append(tmpans)
-    an.reverse()
-    return round(an[0]) * 3 + round(an[1]) if abs(an[0] - round(an[0])) < 0.001 and abs(an[1] - round(an[1])) < 0.001 else 0
+    return round(an[1]) * 3 + round(an[0]) if abs(an[0] - round(an[0])) < 0.001 and abs(an[1] - round(an[1])) < 0.001 else 0
 
 machines = open("input.txt").read().split('\n\n')
 minimum_tokens = 0
