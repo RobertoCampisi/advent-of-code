@@ -61,7 +61,10 @@ end = 70 + 70j
 
 with open("input.txt",'r') as f:
     bytes = f.read().split("\n")
-    for byte in bytes[:200]:
+    for byte in bytes[:1024]:
+        x,y = map(int,byte.split(","))
+        memory[x+y*1j] = 1
+    for byte in bytes[1024:]:
         x,y = map(int,byte.split(","))
         memory[x+y*1j] = 1
         path = astar(memory, start, end)
