@@ -1,59 +1,44 @@
-maze = []
+maze = dict()
 
 with open('example.txt') as f:
     input = f.read()
-    maze = [list(row) for row in input.split('\n')]
+    w, h = len(input.split('\n')[0]), len(input.split('\n'))
+    for j,row in enumerate(input.split('\n')):
+        for i,ch in enumerate(list(row)):
+            maze[i+j*1j] = 1 if ch == '#' else 0
 #directions: E, S, W, N
 directions = [(0,1),(1,0),(0,-1),(-1,0)]
 
-print(maze)
-
-start = (1,len(maze)-2)
-end = (len(maze[0])-2,1)
+start = 1+(h-2)*1j
+end = (w-2)+1j
 
 edges = []
 nodes = []
-visited = []
+visited = set()
 
-nodes.append([start,0])
+nodes.append((start,1))
+visited.add(start)
 
-def is_node(grid,pos):
-    print(pos[1])
-    if grid[pos[1]][pos[0]] == '#':
-        return False
-    adj = []
-    for d in directions:
-        adj.append(grid[pos[1]+d[1]][pos[0]+d[0]])
-    paths = len(list(filter(lambda x: x == '.', adj)))
-    if paths == 1:
-        return False
-    if paths == 2:
-        if adj[0] == '.' and adj[2] == '.':
-            return False
-        elif adj[1] == '.' and adj[3] == '.':
-            return False
-        else:
-            return True
-    else: 
-        return True
+def prance(grid, start, d):
+    queue = [(start,d)]
+    while len(queue) > 0:
+        pos, old_d = queue.pop(0) 
+        #adjecent = list(filter(lambda x: x in grid and grid[x] != 1, [pos+1,pos-1,pos+1j,pos-1j]))
+        #print(adjecent)
+        for d in [1,-1,1j,-1j]:
+            i = 1
+            base_cost = 0 if old_d == d else 1000
+            while grid[pos + d*i] != 1 and grid[pos + d*i] not in visited:
+                i += 1
+                visited.add(pos+d*i)
+            if i > 1:
+                nodes.append((pos+d*(i-1),d))
+                edges.append(((pos,d),(pos+d*(i-1)),base_cost+(i-1)))
+                queue.append((pos+d*(i-1),d))
+        print(queue)
 
-def prance(grid, pos, d):
-    adjecent = []
-    for direction in directions:
-        adjecent.append(grid[pos[1]+direction[1]][pos[0]+direction[0]])
-    for i,adj in enumerate(adjecent):
-        if adj == '.':
-            distance = 1
-            while not is_node(grid, (pos[1] + directions[i][1] * d, pos[0] + directions[i][0] * d)):
-                if grid[pos[1] + directions[i][1] * d][pos[0] + directions[i][0] * d] != '#':
-                    distance += 1
-                else:
-                    break
-            if grid[pos[1] + directions[i][1] * d][pos[0] + directions[i][0] * d] != '#':
-                nodes.append([(pos[0] + directions[i][0],pos[1] + directions[i][1]),i])
-                edges.append(distance + (1000 if d != i else 0))
-
-prance(maze,start,0)    
+prance(maze,start,1)    
 print(nodes)
 print(edges)
+print(visited)
 #print(is_node(maze,start))
