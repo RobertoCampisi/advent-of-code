@@ -1,11 +1,12 @@
-# 🎄 Advent of Code Solutions <!-- sum of stars 1: begin -->(⭐ 62)<!-- sum of stars 1: end --> and CLI 🎄
+# 🎄 Advent of Code Solutions <!-- sum of stars 1: begin -->(⭐ 62)<!-- sum of stars 1: end --> 🎄
 
 [![Advent of Code](https://img.shields.io/badge/Advent%20of%20Code-ffff66?logo=adventofcode&logoColor=000)](<https://adventofcode.com/> "Advent of Code homepage")
 [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](<https://python.org> "Go to Python homepage")
 ![Last commit](https://img.shields.io/github/last-commit/Flizz95/advent-of-code "Last commit")
 
 # advent-of-code
-My personal solutions written in python for the yearly Advent of Code coding challenges.
+My personal solutions written in python for the yearly Advent of Code coding challenges of the year 2024 and partly of 2023.
+Currently I am working on making an command line interface to facilitate comunication with the advent of code website and automatation, such as testing and benchmarking, for future solutions. 
 
 ---
 <!-- Badges of stars: start -->
