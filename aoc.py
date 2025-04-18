@@ -1,6 +1,81 @@
 import json
 import re
+import cmd
 
+#puzzle states are stored in a JSON file
+
+class aocCLI(cmd.Cmd):
+    prompt = '>>'
+    intro = 'Advent of Code command line interface. Type "help" for available commands.'
+    
+    def do_create(self, arg):
+        """
+        Add entry to the JSON file.
+        Create directory and python file(s) for the defined days according to template if needed.
+        DOES NOT OVERWRITE EXISTING FILES
+        """
+        print("WIP!")
+    
+    def do_fetch(self, arg):
+        """
+        Fetch puzzle input from advent of code.
+        """
+        print("WIP!")
+    
+    def do_test(self, arg):
+        """Test puzzle on added examples and compare the outputs to the expected results"""
+        print("WIP!")
+        
+    def do_execute(self, arg):
+        """Execute a puzzle solution on the input and print the output."""
+        print("WIP!")
+        
+    def do_submit(self, arg):
+        """
+        Submits the output of given puzzle solution to the advent of code website.
+        If the answer is correct, it will store the result for the future.
+        """
+        print("WIP!")
+    
+    def do_benchmark(self, arg):
+        """
+        Benchmark the time it takes to execute the given puzzle solution(s). 
+        It will also compare to the correct answer, if it is known already. 
+        """
+        print("WIP!")
+    
+    def do_updateREADME(self,arg):
+        """Update README.md file to represent the current state of answers"""
+        print("WIP!")
+    
+    def do_scan(self, arg):
+        """Does a scan to given directory and adds all unkown puzzles solutions and tests to JSON file"""
+        print("WIP!")
+        
+    def do_quit(self, line):
+        """Exit the CLI."""
+        return True
+    
+    def preloop(self):
+        #load JSON save file
+        pass
+    
+    def postloop(self):
+        #close JSON save file
+        pass
+    
+    def postcmd(self, stop, line):
+        print()  # Add an empty line for better readability
+        return stop
+
+def parse(arg):
+    """
+    parse for most commands.
+    """
+    year = 2024 #default year
+    day = 0
+    return tuple(year,day)
+    
 save = {'token': '123123', 'data': [{'year':2024, 'solutions':[{'day':1},]},{'year':2023},{'year':2022}]}
 
 #README.md contains gold stars (total count of ans_part1 and ans_part2) 
@@ -36,4 +111,5 @@ def update_README():
             
         print(badges)
 
-update_README()
+if __name__ == '__main__':
+    aocCLI().cmdloop()
