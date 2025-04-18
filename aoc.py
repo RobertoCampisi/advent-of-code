@@ -68,13 +68,56 @@ class aocCLI(cmd.Cmd):
         print()  # Add an empty line for better readability
         return stop
 
-def parse(arg):
+def parse(args):
     """
     parse for most commands.
     """
     year = 2024 #default year
-    day = 0
-    return tuple(year,day)
+    days = []
+    year_str = ''
+    day_str = ''
+    if ' ' in args:
+        year_str, day_str = args.split(' ')
+    else:
+        day_str = args
+    day_str = day_str.split(',')
+    #check empty days
+    if day_str == []:
+        raise Exception('NO day given')
+    #year validation
+    res = re.fullmatch(r'(\d{4})', year_str)
+    if res is not None:
+        cand = int(res.group(1))
+        if cand >= 2015 and cand <= 2024:
+           year = cand
+        else:
+            raise Exception('invalid year')    
+    for d in day_str:
+        res = re.fullmatch(r'all', d)
+        if res is not None:
+            for i in range(1, 26):
+                days.append(i)
+        else: 
+            res = re.fullmatch(r'(\d+)-(\d+)', d)
+            if res is not None:
+                cand1 = int(res.group(1))
+                cand2 = int(res.group(2))
+                if cand1 > 0 and cand1 <= 25 and cand2 > 0 and cand2 <= 25:
+                    for i in range(cand1, cand2+1):
+                        days.append(i)
+                else:
+                   raise Exception('invalid day in '+res.group(0))
+            else:
+                res = re.fullmatch(r'(\d+)', d)
+                if res is not None:
+                    cand = int(res.group(1))
+                    if cand > 0 and cand <= 25:
+                        days.append(cand)
+                    else:
+                        raise Exception('invalid day given')
+                else:
+                   raise Exception('invalid day given')
+    return (year,days)
     
 save = {'token': '123123', 'data': [{'year':2024, 'solutions':[{'day':1},]},{'year':2023},{'year':2022}]}
 
