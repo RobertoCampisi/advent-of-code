@@ -2,6 +2,7 @@ import json
 import re
 import cmd
 import os
+import urllib.request
 
 #puzzle and solution states are stored in a JSON file
 SAVEFILE_NAME = "save.json"
@@ -19,6 +20,7 @@ class aocCLI(cmd.Cmd):
         """
         try:
             create(*parse(arg))
+            print('created data entries')
         except Exception as e:
             print('Failed to create data entry: ', e) 
         
@@ -28,8 +30,17 @@ class aocCLI(cmd.Cmd):
         """
         try:
             fetch(*parse(arg))
+            print('fetch puzzle input from Advent of Code')
         except Exception as e:
-            print('Failed to fetch puzzle input: ', e) 
+            print('Failed to fetch puzzle input: ', e)
+
+    def do_token(self, arg):
+        """Stores or shows the token (session cookie) for authorisation to the Advent of Code website"""
+        if arg == '':
+            print('token:', state['token'])
+        else:
+            state['token'] = arg
+        save() 
     
     def do_test(self, arg):
         """Test puzzle on added examples and compare the outputs to the expected results"""
@@ -50,14 +61,20 @@ class aocCLI(cmd.Cmd):
         Submits the output of given puzzle solution to the advent of code website.
         If the answer is correct, it will store the result for the future.
         """
-        print("WIP!")
+        try:
+            run(*parse(arg))
+        except Exception as e:
+            print('Failed to submit solution: ', e) 
     
     def do_benchmark(self, arg):
         """
         Benchmark the time it takes to execute the given puzzle solution(s). 
         It will also compare to the correct answer, if it is known already. 
         """
-        print("WIP!")
+        try:
+            run(*parse(arg))
+        except Exception as e:
+            print('Failed to benchmark solution: ', e) 
     
     def do_updateREADME(self,arg):
         """Update README.md file to represent the current state of answers"""
@@ -77,7 +94,6 @@ class aocCLI(cmd.Cmd):
     def preloop(self):
         pass
             
-    
     def postloop(self):
         #close JSON file
         save()
@@ -154,6 +170,10 @@ def create(year, days):
     if id == -1: #unknown year
         id = len(state['data'])
         state['data'].append({'year':year, 'solutions':[]})
+        try:
+            os.mkdir(str(year))
+        except FileExistsError:
+            pass
     #known days
     known_days = [e['day'] for e in state['data'][id]['solutions']]
     for day in days:   
@@ -161,15 +181,26 @@ def create(year, days):
             print('Warning', day, 'for year ',year,' already exists')
         else:
             state['data'][id]['solutions'].append({'day':day})
-    print('created data entries')
     save()
 
 def fetch(year, days):
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
-    print("WIP!")
-    save()
+    try:#create directory if not exists
+        os.mkdir(str(year)+'/input')
+    except FileExistsError:
+        pass
+    for day in days:
+        req = urllib.request.Request('https://adventofcode.com/'+str(year)+'/day/'+str(day)+'/input')
+        req.add_header('Cookie', 'session='+state['token'])
+        with urllib.request.urlopen(req) as response:
+            html = response.read().decode("utf-8")
+            if 'Puzzle inputs differ by user.  Please log in to get your puzzle input.' not in html:
+                f = open(str(year)+'/input/day'+str(day)+".txt", "w")
+                f.write(html)
+            else:
+                raise Exception("missing or invalid session token")
 
 def test(year, days):
     id = get_year_id(year)
@@ -178,6 +209,18 @@ def test(year, days):
     print("WIP!")
 
 def run(year, days):
+    id = get_year_id(year)
+    if id == -1: #unknown year
+        raise Exception("unknown year")
+    print("WIP!")
+
+def submit(year, days):
+    id = get_year_id(year)
+    if id == -1: #unknown year
+        raise Exception("unknown year")
+    print("WIP!")
+
+def benchmark(year, days):
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
