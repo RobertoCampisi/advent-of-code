@@ -1,8 +1,11 @@
 import json
 import re
 import cmd
+import os
 
-#puzzle states are stored in a JSON file
+#puzzle and solution states are stored in a JSON file
+
+save = {'token': '123123', 'data': [{'year':2024, 'solutions':[{'day':1}]},{'year':2023, 'solutions':[]},{'year':2022, 'solutions':[]}]}
 
 class aocCLI(cmd.Cmd):
     prompt = '>>'
@@ -14,8 +17,11 @@ class aocCLI(cmd.Cmd):
         Create directory and python file(s) for the defined days according to template if needed.
         DOES NOT OVERWRITE EXISTING FILES
         """
-        print("WIP!")
-    
+        try:
+            create(*parse(arg))
+        except Exception as e:
+            print('Failed to create data entry due to: 'e) 
+        
     def do_fetch(self, arg):
         """
         Fetch puzzle input from advent of code.
@@ -57,11 +63,11 @@ class aocCLI(cmd.Cmd):
         return True
     
     def preloop(self):
-        #load JSON save file
+        #load JSON file
         pass
     
     def postloop(self):
-        #close JSON save file
+        #close JSON file
         pass
     
     def postcmd(self, stop, line):
@@ -118,8 +124,25 @@ def parse(args):
                 else:
                    raise Exception('invalid day given')
     return (year,days)
-    
-save = {'token': '123123', 'data': [{'year':2024, 'solutions':[{'day':1},]},{'year':2023},{'year':2022}]}
+
+def create(year, days):
+    id = -1
+    for i, entry in enumerate(save['data']):
+        if entry['year'] == year:
+            id = i
+    if id == -1: #unknown year
+        id = len(save['data'])
+        save['data'].append({'year':year, 'solutions':[]})
+    #known days
+    known_days = [e['day'] for e in save['data'][id]['solutions']]
+    for day in days:   
+        if day in known_days:
+            print('Warning', day, 'for year ',year,' already exists')
+        else:
+            save['data'][id]['solutions'].append({'day':day})
+    print('created data entries')
+    print(json.dumps(save))
+
 
 #README.md contains gold stars (total count of ans_part1 and ans_part2) 
 
@@ -149,7 +172,7 @@ def update_README():
             star_count = str(0) #year_data['solutions']
             summary[year] = star_count
         for entry in summary:
-            badges.append('[![AoC '+y+'](https://img.shields.io/badge/'+y+'-⭐%20'+y+'-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/'+y+')'))
+            badges.append('[![AoC '+y+'](https://img.shields.io/badge/'+y+'-⭐%20'+y+'-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/'+y+')')
             table_rows.append('| ['+y +']('+y+') | ⭐️'+star_count+' | https://adventofcode.com/'+y+'|\n')
             
         print(badges)
