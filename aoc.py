@@ -4,13 +4,13 @@ import cmd
 import os
 
 #puzzle and solution states are stored in a JSON file
-
-save = {'token': '123123', 'data': [{'year':2024, 'solutions':[{'day':1}]},{'year':2023, 'solutions':[]},{'year':2022, 'solutions':[]}]}
+SAVEFILE_NAME = "save.json"
+state = {'token': '', 'data': []}
 
 class aocCLI(cmd.Cmd):
     prompt = '>>'
     intro = 'Advent of Code command line interface. Type "help" for available commands.'
-    
+
     def do_create(self, arg):
         """
         Add entry to the JSON file.
@@ -20,21 +20,30 @@ class aocCLI(cmd.Cmd):
         try:
             create(*parse(arg))
         except Exception as e:
-            print('Failed to create data entry due to: 'e) 
+            print('Failed to create data entry: ', e) 
         
     def do_fetch(self, arg):
         """
         Fetch puzzle input from advent of code.
         """
-        print("WIP!")
+        try:
+            fetch(*parse(arg))
+        except Exception as e:
+            print('Failed to fetch puzzle input: ', e) 
     
     def do_test(self, arg):
         """Test puzzle on added examples and compare the outputs to the expected results"""
-        print("WIP!")
+        try:
+            test(*parse(arg))
+        except Exception as e:
+            print('Failed to test solution: ', e) 
         
-    def do_execute(self, arg):
+    def do_run(self, arg):
         """Execute a puzzle solution on the input and print the output."""
-        print("WIP!")
+        try:
+            run(*parse(arg))
+        except Exception as e:
+            print('Failed to run solution: ', e) 
         
     def do_submit(self, arg):
         """
@@ -52,7 +61,10 @@ class aocCLI(cmd.Cmd):
     
     def do_updateREADME(self,arg):
         """Update README.md file to represent the current state of answers"""
-        print("WIP!")
+        try:
+            update_README()
+        except Exception as e:
+            print('Failed to update README: ', e) 
     
     def do_scan(self, arg):
         """Does a scan to given directory and adds all unkown puzzles solutions and tests to JSON file"""
@@ -63,16 +75,20 @@ class aocCLI(cmd.Cmd):
         return True
     
     def preloop(self):
-        #load JSON file
         pass
+            
     
     def postloop(self):
         #close JSON file
-        pass
+        save()
     
     def postcmd(self, stop, line):
         print()  # Add an empty line for better readability
         return stop
+
+def save():
+    with open(SAVEFILE_NAME, 'w') as savefile:
+            json.dump(state, savefile, indent=2)
 
 def parse(args):
     """
@@ -125,23 +141,47 @@ def parse(args):
                    raise Exception('invalid day given')
     return (year,days)
 
-def create(year, days):
+#return the entry index of given year. returns -1 if entry does not exist
+def get_year_id(year):
     id = -1
-    for i, entry in enumerate(save['data']):
+    for i, entry in enumerate(state['data']):
         if entry['year'] == year:
             id = i
+    return id
+
+def create(year, days):
+    id = get_year_id(year)
     if id == -1: #unknown year
-        id = len(save['data'])
-        save['data'].append({'year':year, 'solutions':[]})
+        id = len(state['data'])
+        state['data'].append({'year':year, 'solutions':[]})
     #known days
-    known_days = [e['day'] for e in save['data'][id]['solutions']]
+    known_days = [e['day'] for e in state['data'][id]['solutions']]
     for day in days:   
         if day in known_days:
             print('Warning', day, 'for year ',year,' already exists')
         else:
-            save['data'][id]['solutions'].append({'day':day})
+            state['data'][id]['solutions'].append({'day':day})
     print('created data entries')
-    print(json.dumps(save))
+    save()
+
+def fetch(year, days):
+    id = get_year_id(year)
+    if id == -1: #unknown year
+        raise Exception("unknown year")
+    print("WIP!")
+    save()
+
+def test(year, days):
+    id = get_year_id(year)
+    if id == -1: #unknown year
+        raise Exception("unknown year")
+    print("WIP!")
+
+def run(year, days):
+    id = get_year_id(year)
+    if id == -1: #unknown year
+        raise Exception("unknown year")
+    print("WIP!")
 
 
 #README.md contains gold stars (total count of ans_part1 and ans_part2) 
@@ -178,4 +218,10 @@ def update_README():
         print(badges)
 
 if __name__ == '__main__':
+    #load JSON file
+    try:
+        with open(SAVEFILE_NAME, 'r') as savefile:
+            state = json.load(savefile)
+    except FileNotFoundError:
+        save()
     aocCLI().cmdloop()
