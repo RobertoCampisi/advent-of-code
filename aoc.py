@@ -3,10 +3,15 @@ import re
 import cmd
 import os
 import urllib.request
+import sys
+
+import subprocess
+from subprocess import Popen, PIPE, STDOUT
 
 #puzzle and solution states are stored in a JSON file
 SAVEFILE_NAME = "save.json"
 state = {'token': '', 'data': []}
+
 
 class aocCLI(cmd.Cmd):
     prompt = '>>'
@@ -215,11 +220,43 @@ def test(year, days):
         raise Exception("unknown year")
     print("WIP!")
 
-def run(year, days):
+def run(year, days, part=0):
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
-    print("WIP!")
+    for day in days:
+        if part == 1:
+            cmd = "python {}/day{}.py part_one".format(year,day)
+            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
+            (output, error) = proc.communicate()
+            if error:
+                print(error.decode(sys.stdout.encoding))
+            else: 
+                print(output.decode(sys.stdout.encoding))
+        elif part == 2:
+            cmd = "python {}/day{}.py part_two".format(year,day)
+            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
+            (output, error) = proc.communicate()
+            if error:
+                print(error.decode(sys.stdout.encoding))
+            else: 
+                print(output.decode(sys.stdout.encoding))
+        else: #todo default to still not submitted part, both if puzzle is fully submitted
+            cmd = "python {}/day{}.py part_one".format(year,day)
+            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
+            (output, error) = proc.communicate()
+            if error:
+                print(error.decode(sys.stdout.encoding))
+            else: 
+                print(output.decode(sys.stdout.encoding))
+            cmd = "python {}/day{}.py part_two".format(year,day)
+            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
+            (output, error) = proc.communicate()
+            if error:
+                print(error.decode(sys.stdout.encoding))
+            else: 
+                print(output.decode(sys.stdout.encoding))
+
 
 def submit(year, days):
     id = get_year_id(year)
@@ -267,7 +304,10 @@ def update_README():
             
         print(badges)
 
+
+
 if __name__ == '__main__':
+    #sys.stout = Log()
     #load JSON file
     try:
         with open(SAVEFILE_NAME, 'r') as savefile:
