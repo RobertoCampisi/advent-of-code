@@ -180,8 +180,7 @@ def create(year, days):
         if day in known_days:
             print('Skipped, ', day, 'for year ',year,' already exists in JSON file')
         else:
-            template = open('template.py', 'r').read()
-            template.format(year,day)
+            template = open('template.py', 'r').read().format(year,day)
             try:
                 with open('{}/day{}.py'.format(year,day),'w') as f:
                     f.write(template)
