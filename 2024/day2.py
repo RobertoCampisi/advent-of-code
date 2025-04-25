@@ -1,7 +1,7 @@
 #import util functions
 
 def parse_input()
-    with open('{0}/input/day{1}.txt','r') as input:
+    with open('2024/input/day2.txt','r') as input:
         return ...
 
 data = parse_input()
