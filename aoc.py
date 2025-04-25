@@ -178,8 +178,15 @@ def create(year, days):
     known_days = [e['day'] for e in state['data'][id]['solutions']]
     for day in days:   
         if day in known_days:
-            print('Warning', day, 'for year ',year,' already exists')
+            print('Skipped, ', day, 'for year ',year,' already exists in JSON file')
         else:
+            template = open('template.py', 'r')
+            template.format(year,day)
+            try:
+                with open('{0}/day{1}.py'.format(year,day),'w') as f:
+                    f.write(template)
+            except FileExistsError:
+                print('Warning python file for', day, 'for year ',year,' already exists.')
             state['data'][id]['solutions'].append({'day':day})
     save()
 
