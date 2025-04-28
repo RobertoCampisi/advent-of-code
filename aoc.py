@@ -281,24 +281,10 @@ def run(year, days, part):
             (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
             print(err) if err else print(out)
         elif part == 2:
-            cmd = "python {}/day{}.py part_two".format(year,day)
-            (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
+            (out, err) = run_solution("python {}/day{}.py part_two".format(year,day))
             print(err) if err else print(out)
         else: #todo default to still not submitted part, both if puzzle is fully submitted
-            cmd = "python {}/day{}.py part_one".format(year,day)
-            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
-            (output, error) = proc.communicate()
-            if error:
-                print(error.decode(sys.stdout.encoding))
-            else: 
-                print(output.decode(sys.stdout.encoding))
-            cmd = "python {}/day{}.py part_two".format(year,day)
-            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
-            (output, error) = proc.communicate()
-            if error:
-                print(error.decode(sys.stdout.encoding))
-            else: 
-                print(output.decode(sys.stdout.encoding))
+            print('WIP!')
 
 
 def submit(year, days):
