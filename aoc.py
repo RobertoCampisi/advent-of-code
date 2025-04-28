@@ -147,8 +147,6 @@ def parse(args):
             else:
                 raise Exception('incorrectly defined part')
     temp = args.split(' ')
-    print(year, days, part)
-    print(temp)
     if len(temp) == 1 and part == 0:
         day_str = temp[0]
     elif len(temp) == 1 and part != 0:
