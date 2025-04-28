@@ -1,6 +1,7 @@
+import sys
 #import util functions
 
-def parse_input()
+def parse_input():
     with open('{0}/input/day{1}.txt','r') as input:
         return ...
 
