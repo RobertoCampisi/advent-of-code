@@ -91,7 +91,15 @@ class aocCLI(cmd.Cmd):
     def do_scan(self, arg):
         """Does a scan to given directory and adds all unkown puzzles solutions and tests to JSON file"""
         print("WIP!")
+
+    def do_parse(self, line):
+        """Test current parse function"""
+        try:
+            print(parse(line))
+        except Exception as e:
+            print('failed to parse:',e)
         
+
     def do_quit(self, line):
         """Exit the CLI."""
         return True
@@ -115,33 +123,68 @@ def parse(args):
     """
     parse for most commands.
     """
-    year = 2024 #default year
+    part_one_patterns = [r'one',r'p[\-_=]{0,1}1',r'part[\-_=]{0,1}one',r'part[\-_=]{0,1}1']
+    part_two_patterns = [r'two',r'p[\-_=]{0,1}2',r'part[\-_=]{0,1}two',r'part[\-_=]{0,1}2']
+    year = 2024 #default year #TODO: automate this, default year updates every end of november
     days = []
+    part = 0 #default 
     year_str = ''
     day_str = ''
-    if ' ' in args:
-        year_str, day_str = args.split(' ')
+    #check for part 1 argument
+    for pttrn in part_one_patterns:
+        m = re.search(pttrn, args, re.IGNORECASE)
+        if m is not None:
+            if part == 0:
+                part = 1
+            else:
+                raise Exception('incorrectly defined part')
+    #check for part 2 argument
+    for pttrn in part_two_patterns:
+        m = re.search(pttrn, args, re.IGNORECASE)
+        if m is not None:
+            if part == 0:
+                part = 2
+            else:
+                raise Exception('incorrectly defined part')
+    temp = args.split(' ')
+    print(year, days, part)
+    print(temp)
+    if len(temp) == 1 and part == 0:
+        day_str = temp[0]
+    elif len(temp) == 1 and part != 0:
+        raise Exception('no day given')
+    elif len(temp) == 2 and part != 0:
+        day_str = temp[0]
+    elif len(temp) == 2 and part == 0:
+        year_str, day_str = temp[0:2]
+    elif len(temp) == 3 and part == 0:
+        raise Exception('too many arguments provided or unclear defined part.')
+    elif len(temp) == 3 and part != 0:
+        year_str, day_str = temp[0:2]
     else:
-        day_str = args
-    day_str = day_str.split(',')
-    #check empty days
-    if day_str == []:
-        raise Exception('NO day given')
+        raise Exception('incorrect number of arguments provided')
     #year validation
-    res = re.fullmatch(r'(\d{4})', year_str)
-    if res is not None:
-        cand = int(res.group(1))
-        if cand >= 2015 and cand <= 2024:
-           year = cand
+    if year_str != '':
+        res = re.fullmatch(r'(\d{4})', year_str)
+        if res is not None:
+            cand = int(res.group(1))
+            if cand >= 2015 and cand <= 2024:
+                year = cand
+            else:
+                raise Exception('{} is an invalid year'.format(cand))
         else:
-            raise Exception('invalid year')    
+            raise Exception('{} is an invalid year'.format(year_str))
+    day_str = day_str.split(',') 
+     #check empty days
+    if day_str == []:
+        raise Exception('no day given')
     for d in day_str:
         res = re.fullmatch(r'all', d)
         if res is not None:
             for i in range(1, 26):
                 days.append(i)
         else: 
-            res = re.fullmatch(r'(\d+)-(\d+)', d)
+            res = re.fullmatch(r'(\d+)\-(\d+)', d)
             if res is not None:
                 cand1 = int(res.group(1))
                 cand2 = int(res.group(2))
@@ -160,7 +203,7 @@ def parse(args):
                         raise Exception('invalid day given')
                 else:
                    raise Exception('invalid day given')
-    return (year,days)
+    return (year,days,part)
 
 #return the entry index of given year. returns -1 if entry does not exist
 def get_year_id(year):
@@ -170,7 +213,9 @@ def get_year_id(year):
             id = i
     return id
 
-def create(year, days):
+def create(year, days, part):
+    if part != 0: 
+        raise Exception('invalid command')
     id = get_year_id(year)
     if id == -1: #unknown year
         id = len(state['data'])
@@ -195,7 +240,9 @@ def create(year, days):
             state['data'][id]['solutions'].append({'day':day})
     save()
 
-def fetch(year, days):
+def fetch(year, days, part):
+    if part != 0: 
+        raise Exception('invalid command')
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
@@ -220,27 +267,23 @@ def test(year, days):
         raise Exception("unknown year")
     print("WIP!")
 
-def run(year, days, part=0):
+def run_solution(cmd):
+    proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
+    (output, error) = proc.communicate()
+    return (output.decode(sys.stdout.encoding), error.decode(sys.stdout.encoding))
+
+def run(year, days, part):
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
     for day in days:
         if part == 1:
-            cmd = "python {}/day{}.py part_one".format(year,day)
-            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
-            (output, error) = proc.communicate()
-            if error:
-                print(error.decode(sys.stdout.encoding))
-            else: 
-                print(output.decode(sys.stdout.encoding))
+            (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
+            print(err) if err else print(out)
         elif part == 2:
             cmd = "python {}/day{}.py part_two".format(year,day)
-            proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
-            (output, error) = proc.communicate()
-            if error:
-                print(error.decode(sys.stdout.encoding))
-            else: 
-                print(output.decode(sys.stdout.encoding))
+            (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
+            print(err) if err else print(out)
         else: #todo default to still not submitted part, both if puzzle is fully submitted
             cmd = "python {}/day{}.py part_one".format(year,day)
             proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
