@@ -13,5 +13,18 @@ def part_one():
 def part_two():
     ...
 
+def benchmark(func, n):
+    from time import time
+    start = time()
+    for i in range(0, n):
+        func()
+    end = time()
+    print((end - start) / n)
+
 if __name__ == '__main__':
-    globals()[sys.argv[1]]()
+    if len(sys.argv) == 2:
+        globals()[sys.argv[1]]()
+    elif len(sys.argv) > 2:
+        globals()[sys.argv[1]](*sys.argv[2:])
+    else:
+        raise RuntimeError

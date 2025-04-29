@@ -4,6 +4,7 @@ import cmd
 import os
 import urllib.request
 import sys
+import timeit
 
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
@@ -125,9 +126,11 @@ def parse(args):
     """
     part_one_patterns = [r'one',r'p[\-_=]{0,1}1',r'part[\-_=]{0,1}one',r'part[\-_=]{0,1}1']
     part_two_patterns = [r'two',r'p[\-_=]{0,1}2',r'part[\-_=]{0,1}two',r'part[\-_=]{0,1}2']
+    number_option_patterns = [r'n[\-_=]{0,1}(\d)'] #additional integer used for some functions
     year = 2024 #default year #TODO: automate this, default year updates every end of november
     days = []
-    part = 0 #default 
+    part = 0 #default
+    number = None #no defined default
     year_str = ''
     day_str = ''
     #check for part 1 argument
@@ -137,7 +140,7 @@ def parse(args):
             if part == 0:
                 part = 1
             else:
-                raise Exception('incorrectly defined part')
+                raise Exception('invalid arguments')
     #check for part 2 argument
     for pttrn in part_two_patterns:
         m = re.search(pttrn, args, re.IGNORECASE)
@@ -145,19 +148,33 @@ def parse(args):
             if part == 0:
                 part = 2
             else:
-                raise Exception('incorrectly defined part')
+                raise Exception('invalid arguments')
+    # check for number argument
+    for pttrn in number_option_patterns:
+        m = re.search(pttrn, args, re.IGNORECASE)
+        if m is not None:
+            if number is None:
+                number = m[1]
+            else:
+                raise Exception('invalid arguments')
     temp = args.split(' ')
-    if len(temp) == 1 and part == 0:
+    if len(temp) == 1 and part == 0 and number is None:
         day_str = temp[0]
-    elif len(temp) == 1 and part != 0:
-        raise Exception('no day given')
-    elif len(temp) == 2 and part != 0:
+    elif len(temp) == 1 and (part != 0 or number is not None):
+        raise Exception('required argument for day missing')
+    elif len(temp) == 2 and (part != 0 or number is not None):
         day_str = temp[0]
-    elif len(temp) == 2 and part == 0:
+    elif len(temp) == 3 and part != 0 and number is not None:
+        day_str = temp[0]
+    elif len(temp) == 2 and part == 0 and number is None:
         year_str, day_str = temp[0:2]
-    elif len(temp) == 3 and part == 0:
+    elif len(temp) == 3 and part == 0 and number is not None:
+        year_str, day_str = temp[0:2]
+    elif len(temp) == 3 and part != 0 and number is None:
+        year_str, day_str = temp[0:2]
+    elif len(temp) == 3 and part == 0 and number is None:
         raise Exception('too many arguments provided or unclear defined part.')
-    elif len(temp) == 3 and part != 0:
+    elif len(temp) == 4 and part != 0 and number is not None:
         year_str, day_str = temp[0:2]
     else:
         raise Exception('incorrect number of arguments provided')
@@ -201,7 +218,7 @@ def parse(args):
                         raise Exception('invalid day given')
                 else:
                    raise Exception('invalid day given')
-    return year,days,part
+    return year,days,part,number
 
 #return the entry index of given year. returns -1 if entry does not exist
 def get_year_id(year):
@@ -239,9 +256,9 @@ def create(year, days, part):
             state['data'][id]['solutions'].append({'day':day})
     save()
 
-def fetch(year, days, part):
-    if part != 0: 
-        raise Exception('invalid command')
+def fetch(year, days, part, number):
+    if part != 0 or number is not None:
+        raise Exception('invalid argument')
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
@@ -271,7 +288,9 @@ def run_solution(cmd):
     (output, error) = proc.communicate()
     return output.decode(sys.stdout.encoding), error.decode(sys.stdout.encoding)
 
-def run(year, days, part):
+def run(year, days, part, number):
+    if number is not None:
+        raise Exception('invalid argument')
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
@@ -292,12 +311,27 @@ def submit(year, days):
         raise Exception("unknown year")
     print("WIP!")
 
-def benchmark(year, days):
+def benchmark(year, days, part, number):
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
-    print("WIP!")
-
+    if number < 1:
+        raise Exception('invalid argument')
+    for day in days:
+        match part:
+            case 0:
+                (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
+                print(err) if err else print("day {} part_one took {} seconds.".format(day, out))
+                (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
+                print(err) if err else print("day {} part_two took {} seconds.".format(day, out))
+            case 1:
+                (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
+                print(err) if err else print("day {} part_one took {} seconds.".format(day, out))
+            case 2:
+                (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
+                print(err) if err else print("day {} part_two took {} seconds.".format(day, out))
+            case _:
+                raise Exception('invalid arguments')
 
 #README.md contains gold stars (total count of ans_part1 and ans_part2) 
 
