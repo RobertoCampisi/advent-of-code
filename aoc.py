@@ -13,7 +13,7 @@ SAVEFILE_NAME = "save.json"
 state = {'token': '', 'data': []}
 
 
-class aocCLI(cmd.Cmd):
+class AoCCLI(cmd.Cmd):
     prompt = '>>'
     intro = 'Advent of Code command line interface. Type "help" for available commands.'
 
@@ -93,7 +93,7 @@ class aocCLI(cmd.Cmd):
         print("WIP!")
 
     def do_parse(self, line):
-        """Test current parse function"""
+        """method to Test current parse function"""
         try:
             print(parse(line))
         except Exception as e:
@@ -166,7 +166,7 @@ def parse(args):
         res = re.fullmatch(r'(\d{4})', year_str)
         if res is not None:
             cand = int(res.group(1))
-            if cand >= 2015 and cand <= 2024:
+            if 2015 <= cand <= 2024:
                 year = cand
             else:
                 raise Exception('{} is an invalid year'.format(cand))
@@ -174,7 +174,7 @@ def parse(args):
             raise Exception('{} is an invalid year'.format(year_str))
     day_str = day_str.split(',') 
      #check empty days
-    if day_str == []:
+    if not day_str:
         raise Exception('no day given')
     for d in day_str:
         res = re.fullmatch(r'all', d)
@@ -186,7 +186,7 @@ def parse(args):
             if res is not None:
                 cand1 = int(res.group(1))
                 cand2 = int(res.group(2))
-                if cand1 > 0 and cand1 <= 25 and cand2 > 0 and cand2 <= 25:
+                if 0 < cand1 <= 25 and 0 < cand2 <= 25:
                     for i in range(cand1, cand2+1):
                         days.append(i)
                 else:
@@ -195,13 +195,13 @@ def parse(args):
                 res = re.fullmatch(r'(\d+)', d)
                 if res is not None:
                     cand = int(res.group(1))
-                    if cand > 0 and cand <= 25:
+                    if 0 < cand <= 25:
                         days.append(cand)
                     else:
                         raise Exception('invalid day given')
                 else:
                    raise Exception('invalid day given')
-    return (year,days,part)
+    return year,days,part
 
 #return the entry index of given year. returns -1 if entry does not exist
 def get_year_id(year):
@@ -229,11 +229,12 @@ def create(year, days, part):
             print('Skipped, ', day, 'for year ',year,' already exists in JSON file')
         else:
             template = open('template.py', 'r').read().format(year,day)
-            try:
-                with open('{}/day{}.py'.format(year,day),'w') as f:
+            fname = '{}/day{}.py'.format(year,day)
+            if not os.path.isfile(fname):
+                with open(fname,'w') as f:
                     f.write(template)
-                    print('Succesfully created {}/day{}.py'.format(year,day))
-            except FileExistsError:
+                    print('Successfully created {}'.format(fname))
+            else:
                 print('Warning python file for {} for year {} already exists.'.format(day, year))
             state['data'][id]['solutions'].append({'day':day})
     save()
@@ -268,7 +269,7 @@ def test(year, days):
 def run_solution(cmd):
     proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
     (output, error) = proc.communicate()
-    return (output.decode(sys.stdout.encoding), error.decode(sys.stdout.encoding))
+    return output.decode(sys.stdout.encoding), error.decode(sys.stdout.encoding)
 
 def run(year, days, part):
     id = get_year_id(year)
@@ -341,4 +342,4 @@ if __name__ == '__main__':
             state = json.load(savefile)
     except FileNotFoundError:
         save()
-    aocCLI().cmdloop()
+    AoCCLI().cmdloop()
