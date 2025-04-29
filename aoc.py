@@ -78,7 +78,7 @@ class AoCCLI(cmd.Cmd):
         It will also compare to the correct answer, if it is known already. 
         """
         try:
-            run(*parse(arg))
+            benchmark(*parse(arg))
         except Exception as e:
             print('Failed to benchmark solution: ', e) 
     
@@ -120,13 +120,14 @@ def save():
     with open(SAVEFILE_NAME, 'w') as savefile:
             json.dump(state, savefile, indent=2)
 
+#TODO simplify and unspaghettify the function
 def parse(args):
     """
     parse for most commands.
     """
     part_one_patterns = [r'one',r'p[\-_=]{0,1}1',r'part[\-_=]{0,1}one',r'part[\-_=]{0,1}1']
     part_two_patterns = [r'two',r'p[\-_=]{0,1}2',r'part[\-_=]{0,1}two',r'part[\-_=]{0,1}2']
-    number_option_patterns = [r'n[\-_=]{0,1}(\d)'] #additional integer used for some functions
+    number_option_patterns = [r'n[\-_=]{0,1}(\d+)'] #additional integer used for some functions
     year = 2024 #default year #TODO: automate this, default year updates every end of november
     days = []
     part = 0 #default
@@ -154,7 +155,7 @@ def parse(args):
         m = re.search(pttrn, args, re.IGNORECASE)
         if m is not None:
             if number is None:
-                number = m[1]
+                number = int(m[1])
             else:
                 raise Exception('invalid arguments')
     temp = args.split(' ')
@@ -267,12 +268,12 @@ def fetch(year, days, part, number):
     except FileExistsError:
         pass
     for day in days:
-        req = urllib.request.Request('https://adventofcode.com/'+str(year)+'/day/'+str(day)+'/input')
+        req = urllib.request.Request('https://adventofcode.com/{}}/day/{}/input'.format(year,day))
         req.add_header('Cookie', 'session='+state['token'])
         with urllib.request.urlopen(req) as response:
             html = response.read().decode("utf-8")
             if 'Puzzle inputs differ by user.  Please log in to get your puzzle input.' not in html:
-                f = open(str(year)+'/input/day'+str(day)+".txt", "w")
+                f = open('{}/input/day{}.txt'.format(year, day), "w")
                 f.write(html)
             else:
                 raise Exception("missing or invalid session token")
@@ -295,14 +296,20 @@ def run(year, days, part, number):
     if id == -1: #unknown year
         raise Exception("unknown year")
     for day in days:
-        if part == 1:
-            (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
-            print(err) if err else print(out)
-        elif part == 2:
-            (out, err) = run_solution("python {}/day{}.py part_two".format(year,day))
-            print(err) if err else print(out)
-        else: #todo default to still not submitted part, both if puzzle is fully submitted
-            print('WIP!')
+        match part:
+            case 0:
+                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                print(err) if err else print(out)
+                (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
+                print(err) if err else print(out)
+            case 1:
+                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                print(err) if err else print(out)
+            case 2:
+                (out, err) = run_solution("python {}/day{}.py part_two".format(year,day))
+                print(err) if err else print(out)
+            case _:
+                raise Exception('invalid argument')
 
 
 def submit(year, days):
@@ -315,21 +322,23 @@ def benchmark(year, days, part, number):
     id = get_year_id(year)
     if id == -1: #unknown year
         raise Exception("unknown year")
+    if number is None:
+        number = 10 #default
     if number < 1:
         raise Exception('invalid argument')
     for day in days:
         match part:
             case 0:
                 (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
-                print(err) if err else print("day {} part_one took {} seconds.".format(day, out))
+                print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
                 (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
-                print(err) if err else print("day {} part_two took {} seconds.".format(day, out))
+                print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
             case 1:
                 (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
-                print(err) if err else print("day {} part_one took {} seconds.".format(day, out))
+                print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
             case 2:
                 (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
-                print(err) if err else print("day {} part_two took {} seconds.".format(day, out))
+                print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
             case _:
                 raise Exception('invalid arguments')
 
