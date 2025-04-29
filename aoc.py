@@ -229,8 +229,10 @@ def get_year_id(year):
             id = i
     return id
 
-def create(year, days, part):
+def create(year, days, part, number):
     if part != 0: 
+        raise Exception('invalid command')
+    if number is not None:
         raise Exception('invalid command')
     id = get_year_id(year)
     if id == -1: #unknown year
@@ -323,7 +325,7 @@ def benchmark(year, days, part, number):
     if id == -1: #unknown year
         raise Exception("unknown year")
     if number is None:
-        number = 10 #default
+        number = 100 #default
     if number < 1:
         raise Exception('invalid argument')
     for day in days:
@@ -331,6 +333,7 @@ def benchmark(year, days, part, number):
             case 0:
                 (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
                 print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
+                #state['data'][id]['solution']
                 (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
                 print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
             case 1:
