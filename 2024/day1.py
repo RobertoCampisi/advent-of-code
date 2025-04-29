@@ -1,13 +1,15 @@
-#import util functions
 import sys
+#import util functions
+
 
 def parse_input():
-    with open('2024/input/day1.txt','r') as input:
-        return input.read().splitlines()
+    with open('2024/input/day1.txt','r') as input_file:
+        return input_file.readlines()
 
 data = parse_input()
 
-def part_one(data=data):
+def part_one():
+
     left, right = [], []
     for line in data:
         l, r = list(map(int, line.split("   ")))
@@ -16,7 +18,7 @@ def part_one(data=data):
     print(sum([abs(a - b) for (a,b) in zip(sorted(left),sorted(right))]))
 
 
-def part_two(data=data):
+def part_two():
     left, right = [], {}
     for line in data:
         l, r = list(map(int, line.split("   ")))
