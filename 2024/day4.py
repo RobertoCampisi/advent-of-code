@@ -31,15 +31,16 @@ def part_two():
                 total += 1
     print(total)
 
+#simple benchmark function.
 def benchmark(func, n):
     from time import time_ns
-    start = time_ns() // 1_000_000
+    start = time_ns() // 1_000 #microseconds
     sys.stdout = None  # bit hacky but it works
     for i in range(0, int(n)):
         globals()[func]()
-    sys.stdout = sys.__stdout__ #restore
-    end = time_ns() // 1_000_000
-    print((end - start) / int(n), end='')
+    sys.stdout = sys.__stdout__ #restore stdout
+    end = time_ns() // 1_000 #microseconds
+    print((end - start) / int(n) / 1000, end='')
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
