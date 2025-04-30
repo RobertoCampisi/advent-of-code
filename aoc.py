@@ -4,7 +4,7 @@ import cmd
 import os
 import urllib.request
 import sys
-import timeit
+import time
 
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
@@ -68,7 +68,7 @@ class AoCCLI(cmd.Cmd):
         If the answer is correct, it will store the result for the future.
         """
         try:
-            run(*parse(arg))
+            submit(*parse(arg))
         except Exception as e:
             print('Failed to submit solution: ', e) 
     
@@ -226,10 +226,10 @@ def create(year, days, part, number):
         raise Exception('invalid command')
     if number is not None:
         raise Exception('invalid command')
-    if str(year) not in state['data']: #unknown year
+    if year not in state['data']: #unknown year
         state['data'][year] = {}
         try:
-            os.mkdir(str(year))
+            os.mkdir(year)
         except FileExistsError:
             pass
     #known days
@@ -251,16 +251,16 @@ def create(year, days, part, number):
 def fetch(year, days, part, number):
     if part != 0 or number is not None:
         raise Exception('invalid argument')
-    if str(year) not in state['data']: #unknown year
+    if year not in state['data']: #unknown year
         raise Exception("unknown year")
     try:#create directory if not exists
-        os.mkdir(str(year)+'/input')
+        os.mkdir(year+'/input')
     except FileExistsError:
         pass
     for day in days:
         if day in state['data'][year]:
             if state['token'] == '':
-                    raise Exception("missing session token. please add the <session cookie> to token in the savefile or use token <session_cookie>.")
+                raise Exception("missing session token. please add the <session cookie> to token in the savefile or use token <session_cookie>.")
             req = urllib.request.Request('https://adventofcode.com/{}/day/{}/input'.format(year,day))
             req.add_header('Cookie', 'session='+state['token'])
             with urllib.request.urlopen(req) as response:
@@ -270,10 +270,11 @@ def fetch(year, days, part, number):
                     f.write(html)
                 else:
                     raise Exception("invalid session token")
+        time.sleep(1)
         
 
 def test(year, days):
-    if str(year) not in state['data']: #unknown year
+    if year not in state['data']: #unknown year
         raise Exception("unknown year")
     print("WIP!")
 
@@ -285,7 +286,7 @@ def run_solution(cmd):
 def run(year, days, part, number):
     if number is not None:
         raise Exception('invalid argument')
-    if str(year) not in state['data']: #unknown year
+    if year not in state['data']: #unknown year
         raise Exception("unknown year")
     for day in days:
         match part:
@@ -303,14 +304,52 @@ def run(year, days, part, number):
             case _:
                 raise Exception('invalid argument')
 
+def fetch_previous_submission(year, day, part):
+    if state['token'] == '':
+        raise Exception("missing session token. please add the <session cookie> to token in the savefile or use token <session_cookie>.")
+    req = urllib.request.Request('https://adventofcode.com/{}/day/{}'.format(year,day))
+    req.add_header('Cookie', 'session='+state['token'])
+    with urllib.request.urlopen(req) as response:
+        html = response.read().decode("utf-8")
+        prev_submissions = re.findall(r'<p>Your puzzle answer was <code>(.*)</code>.</p>', html)
+        if len(prev_submissions) == 2: #both parts submitted and answered correctly
+            state['data'][year][day]['answer_p1'] = prev_submissions[0]
+            state['data'][year][day]['answer_p2'] = prev_submissions[1]
+            print('found previous answer for part 1 and 2')
+        elif len(prev_submissions) == 1: #part 1 
+            state['data'][year][day]['answer_p1'] = prev_submissions[0]
+            print('found previous answer for part 1')
+        else:
+            print('no previous answer found')
+    save()
 
-def submit(year, days):
-    if str(year) not in state['data']: #unknown year
+def submit(year, days, part, number):
+    if number is not None:
+        raise Exception('nubmer argument invalid for command submit')
+    if year not in state['data']: #unknown year
         raise Exception("unknown year")
+    for day in days:
+        match part:
+            case 1:
+                if  state['data'][year][day]['answer_p1'] is None:
+                    #check for previous submission
+                    print("checking for previous submissions...")
+                    fetch_previous_submission(year,day,1)
+                    
+                    #(out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                    #if err:
+                    #    print(err)
+                    #else:
+                    #    print(''.format(out))
+                    #    if out == state['data'][year][day]['answer_p1']:
+                    #        print('')
+            case _:
+                raise Exception('invalid part argument')
+        time.sleep(1) #to reduce request load to advent of code
     print("WIP!")
 
 def benchmark(year, days, part, number):
-    if str(year) not in state['data']: #unknown year
+    if year not in state['data']: #unknown year
         raise Exception("unknown year")
     if number is None:
         number = 100 #default
