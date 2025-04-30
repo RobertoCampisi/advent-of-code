@@ -328,22 +328,28 @@ def benchmark(year, days, part, number):
         number = 100 #default
     if number < 1:
         raise Exception('invalid argument')
+    total_milliseconds = 0.0
     for day in days:
         match part:
             case 0:
                 (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
                 print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
+                total_milliseconds += float(out) if not err else 0.0
                 #state['data'][id]['solution']
                 (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
                 print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
+                total_milliseconds += float(out)  if not err else 0.0
             case 1:
                 (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
                 print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
+                total_milliseconds += float(out)  if not err else 0.0
             case 2:
                 (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
                 print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
+                total_milliseconds += float(out)  if not err else 0.0
             case _:
                 raise Exception('invalid arguments')
+    print("total average time taken: {} milliseconds".format(total_milliseconds))
 
 #README.md contains gold stars (total count of ans_part1 and ans_part2) 
 
