@@ -336,7 +336,7 @@ def submit_answer(year, day, part, answer):
         html = response.read().decode("utf-8")
         #todo extract response msg and return this
         if re.search('That\'s the'): #assume answer is correct TODO:verify this
-            state['data'][year][day]['answer_p{part}'] = answer
+            state['data'][year][day]['answer_p{}'.format(part)] = answer
             save()
             return True
         return False
@@ -363,15 +363,15 @@ def submit(year, days, part, number):
                         print("sumbitting \"{}\" as answer for day {} part 1".format(out, day))
                         #TODO: store submission time and build in 5 minute check before resubmitting
                         if submit_answer(year, day, 1, out):
-                            print(u"* The answer is correct! *")
+                            print("\"{}\" : * The answer is correct! *".format(out))
                         else:
-                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                            print("\"{}\", sadly, is incorrect. wait 5 minutes before resubmitting.".format(out))
                             on_cooldown = True
                     else:
                         if out == state['data'][year][day]['answer_p1']:
-                            print(u"* The answer is correct! *")
+                            print("\"{}\" : * The answer is correct! *".format(out))
                         else:
-                            print("Sadly, it is incorrect.")
+                            print("\"{}\", sadly, is incorrect. ".format(out))
                 if not on_cooldown:
                     (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
                     if err:
@@ -382,14 +382,14 @@ def submit(year, days, part, number):
                             print("sumbitting \"{}\" as answer for day {} part 2".format(out, day))
                             #TODO: store submission time and build in 5 minute check before resubmitting
                             if submit_answer(year, day, 2, out):
-                                print("* The answer is correct! *")
+                                print("\"{}\" : * The answer is correct! *".format(out))
                             else:
-                                print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                                print("\"{}\", sadly, is incorrect. wait 5 minutes before resubmitting.".format(out))
                         else:
                             if out == state['data'][year][day]['answer_p2']:
-                                print("* The answer is correct! *")
+                                print("\"{}\" : * The answer is correct! *".format(out))
                             else:
-                                print("Sadly, it is incorrect.")
+                                print("\"{}\", sadly, is incorrect. ".format(out))
                 else: 
                     raise Exception('The submission of day {day} part 1 was incorrect. \nCurrent submissions are on a five minute timeout. Please wait before resubmitting.')
             case 1:
@@ -402,14 +402,14 @@ def submit(year, days, part, number):
                         print("sumbitting \"{}\" as answer for day {} part 1".format(out, day))
                         #TODO: store submission time and build in 5 minute check before resubmitting
                         if submit_answer(year, day, 1, out):
-                            print("* The answer is correct! *")
+                            print("\"{}\" : * The answer is correct! *".format(out))
                         else:
-                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                            print("\"{}\", sadly, is incorrect. wait 5 minutes before resubmitting.".format(out))
                     else:
                         if out == state['data'][year][day]['answer_p1']:
-                            print("* The answer is correct! *")
+                            print("\"{}\" : * The answer is correct! *".format(out))
                         else:
-                            print("Sadly, it is incorrect.")
+                            print("\"{}\", sadly, is incorrect. ".format(out))
             case 2:
                 (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
                 if err:
@@ -420,14 +420,14 @@ def submit(year, days, part, number):
                         print("sumbitting \"{}\" as answer for day {} part 2".format(out, day))
                         #TODO: store submission time and build in 5 minute check before resubmitting
                         if submit_answer(year, day, 2, out):
-                            print("* The answer is correct! *")
+                            print("\"{}\" : * The answer is correct! *".format(out))
                         else:
-                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                            print("\"{}\", sadly, is incorrect. wait 5 minutes before resubmitting.".format(out))
                     else:
                         if out == state['data'][year][day]['answer_p2']:
-                            print("* The answer is correct! *")
+                            print("\"{}\" : * The answer is correct! *".format(out))
                         else:
-                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.") 
+                            print("\"{}\", sadly, is incorrect. ".format(out))
             case _:
                 raise Exception('invalid part argument')
         time.sleep(1) #to reduce request load to advent of code
