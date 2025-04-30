@@ -265,11 +265,14 @@ def fetch(year, days, part, number):
             req.add_header('Cookie', 'session='+state['token'])
             with urllib.request.urlopen(req) as response:
                 html = response.read().decode("utf-8")
-                if 'Puzzle inputs differ by user.  Please log in to get your puzzle input.' not in html:
-                    f = open('{}/input/day{}.txt'.format(year, day), "w")
-                    f.write(html)
+                if response.ok:
+                    if 'Puzzle inputs differ by user. Please log in to get your puzzle input.' not in html:
+                        f = open('{}/input/day{}.txt'.format(year, day), "w")
+                        f.write(html)
+                    else:
+                        raise ValueError("Received bad response")
                 else:
-                    raise Exception("invalid session token")
+                        raise ValueError("Received bad response")
         time.sleep(1)
         
 
@@ -281,7 +284,7 @@ def test(year, days):
 def run_solution(cmd):
     proc = Popen(cmd.split(' '), stdout=PIPE, stderr=PIPE)
     (output, error) = proc.communicate()
-    return output.decode(sys.stdout.encoding), error.decode(sys.stdout.encoding)
+    return output.decode(sys.stdout.encoding).strip(), error.decode(sys.stdout.encoding)
 
 def run(year, days, part, number):
     if number is not None:
@@ -304,7 +307,7 @@ def run(year, days, part, number):
             case _:
                 raise Exception('invalid argument')
 
-def fetch_previous_submission(year, day, part):
+def fetch_previous_submission(year, day):
     if state['token'] == '':
         raise Exception("missing session token. please add the <session cookie> to token in the savefile or use token <session_cookie>.")
     req = urllib.request.Request('https://adventofcode.com/{}/day/{}'.format(year,day))
@@ -323,26 +326,108 @@ def fetch_previous_submission(year, day, part):
             print('no previous answer found')
     save()
 
+def submit_answer(year, day, part, answer):
+    if state['token'] == '':
+        raise Exception("missing session token. please add the <session cookie> to token in the savefile or use token <session_cookie>.")
+    data = urllib.parse.urlencode({'level':part, 'answer':answer})    
+    req = urllib.request.Request('https://adventofcode.com/{}/day/{}/answer'.format(year,day),data=data)
+    req.add_header('Cookie', 'session='+state['token'])
+    with urllib.request.urlopen(req) as response:
+        html = response.read().decode("utf-8")
+        #todo extract response msg and return this
+        if re.search('That\'s the'): #assume answer is correct TODO:verify this
+            state['data'][year][day]['answer_p{part}'] = answer
+            save()
+            return True
+        return False
+
 def submit(year, days, part, number):
     if number is not None:
         raise Exception('nubmer argument invalid for command submit')
     if year not in state['data']: #unknown year
         raise Exception("unknown year")
     for day in days:
+        if  state['data'][year][day]['answer_p1'] is None or state['data'][year][day]['answer_p2'] is None:
+            #check for previous submission
+            print("checking for previous answers...")
+            fetch_previous_submission(year,day)
         match part:
+            case 0:
+                on_cooldown = False
+                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                if err:
+                    print(err)
+                    raise RuntimeError
+                else:
+                    if  state['data'][year][day]['answer_p1'] is None:
+                        print("sumbitting \"{}\" as answer for day {} part 1".format(out, day))
+                        #TODO: store submission time and build in 5 minute check before resubmitting
+                        if submit_answer(year, day, 1, out):
+                            print(u"* The answer is correct! *")
+                        else:
+                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                            on_cooldown = True
+                    else:
+                        if out == state['data'][year][day]['answer_p1']:
+                            print(u"* The answer is correct! *")
+                        else:
+                            print("Sadly, it is incorrect.")
+                if not on_cooldown:
+                    (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                    if err:
+                        print(err)
+                        raise RuntimeError
+                    else:
+                        if  state['data'][year][day]['answer_p2'] is None:
+                            print("sumbitting \"{}\" as answer for day {} part 2".format(out, day))
+                            #TODO: store submission time and build in 5 minute check before resubmitting
+                            if submit_answer(year, day, 2, out):
+                                print("* The answer is correct! *")
+                            else:
+                                print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                        else:
+                            if out == state['data'][year][day]['answer_p2']:
+                                print("* The answer is correct! *")
+                            else:
+                                print("Sadly, it is incorrect.")
+                else: 
+                    raise Exception('The submission of day {day} part 1 was incorrect. \nCurrent submissions are on a five minute timeout. Please wait before resubmitting.')
             case 1:
-                if  state['data'][year][day]['answer_p1'] is None:
-                    #check for previous submission
-                    print("checking for previous submissions...")
-                    fetch_previous_submission(year,day,1)
-                    
-                    #(out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
-                    #if err:
-                    #    print(err)
-                    #else:
-                    #    print(''.format(out))
-                    #    if out == state['data'][year][day]['answer_p1']:
-                    #        print('')
+                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                if err:
+                    print(err)
+                    raise RuntimeError
+                else:
+                    if  state['data'][year][day]['answer_p1'] is None:
+                        print("sumbitting \"{}\" as answer for day {} part 1".format(out, day))
+                        #TODO: store submission time and build in 5 minute check before resubmitting
+                        if submit_answer(year, day, 1, out):
+                            print("* The answer is correct! *")
+                        else:
+                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                    else:
+                        if out == state['data'][year][day]['answer_p1']:
+                            print("* The answer is correct! *")
+                        else:
+                            print("Sadly, it is incorrect.")
+            case 2:
+                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                if err:
+                    print(err)
+                    raise RuntimeError
+                else:
+                    if  state['data'][year][day]['answer_p2'] is None:
+                        print("sumbitting \"{}\" as answer for day {} part 2".format(out, day))
+                        #TODO: store submission time and build in 5 minute check before resubmitting
+                        if submit_answer(year, day, 2, out):
+                            print("* The answer is correct! *")
+                        else:
+                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.")
+                    else:
+                        if out == state['data'][year][day]['answer_p2']:
+                            print("* The answer is correct! *")
+                        else:
+                            print("Sadly, it is incorrect. wait 5 minutes before resubmitting.") 
             case _:
                 raise Exception('invalid part argument')
         time.sleep(1) #to reduce request load to advent of code
