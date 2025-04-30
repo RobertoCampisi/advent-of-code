@@ -270,7 +270,7 @@ def fetch(year, days, part, number):
     except FileExistsError:
         pass
     for day in days:
-        req = urllib.request.Request('https://adventofcode.com/{}}/day/{}/input'.format(year,day))
+        req = urllib.request.Request('https://adventofcode.com/{}/day/{}/input'.format(year,day))
         req.add_header('Cookie', 'session='+state['token'])
         with urllib.request.urlopen(req) as response:
             html = response.read().decode("utf-8")
