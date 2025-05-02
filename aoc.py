@@ -265,7 +265,7 @@ def fetch(year, days, part, number):
             req.add_header('Cookie', 'session='+state['token'])
             with urllib.request.urlopen(req) as response:
                 html = response.read().decode("utf-8")
-                if response.ok:
+                if response.status == 200:
                     if 'Puzzle inputs differ by user. Please log in to get your puzzle input.' not in html:
                         f = open('{}/input/day{}.txt'.format(year, day), "w")
                         f.write(html)
@@ -273,7 +273,7 @@ def fetch(year, days, part, number):
                         raise ValueError("Received bad response")
                 else:
                         raise ValueError("Received bad response")
-        time.sleep(1)
+        time.sleep(1)#we do not want to spam the website, when fetching input data in bulk
         
 
 def test(year, days):
