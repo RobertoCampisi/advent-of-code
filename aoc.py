@@ -294,9 +294,9 @@ def run(year, days, part, number):
     for day in days:
         match part:
             case 0:
-                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
-                print(err) if err else print(out)
                 (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
+                print(err) if err else print(out)
+                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
                 print(err) if err else print(out)
             case 1:
                 (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
