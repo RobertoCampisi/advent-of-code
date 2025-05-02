@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-#import util functions
+#import my_util functions
 
 def parse_input():
     with open('2024/input/day1.txt','r') as input_file:
