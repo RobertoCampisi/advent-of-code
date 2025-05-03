@@ -264,8 +264,8 @@ def fetch(year, days, part, number):
             req = urllib.request.Request('https://adventofcode.com/{}/day/{}/input'.format(year,day))
             req.add_header('Cookie', 'session='+state['token'])
             with urllib.request.urlopen(req) as response:
-                html = response.read().decode("utf-8")
                 if response.status == 200:
+                    html = response.read().decode("utf-8")
                     if 'Puzzle inputs differ by user. Please log in to get your puzzle input.' not in html:
                         f = open('{}/input/day{}.txt'.format(year, day), "w")
                         f.write(html)
@@ -469,9 +469,10 @@ def benchmark(year, days, part, number):
                     state['data'][year][day]['p2_prev_bench'] = out + ' ms'
             case _:
                 raise Exception('invalid arguments')
+        if number >= 10:
+            save()
     print("total average time taken: {} milliseconds".format(total_milliseconds))
-    if number >= 10:
-        save()
+
 
 #README.md contains gold stars (total count of ans_part1 and ans_part2) 
 
