@@ -9,7 +9,6 @@ def parse_input():
     with open('2024/input/day8.txt','r') as input_file:
         return  input_file.read().strip().split("\n")
 
-
 def in_bounds(a, w, h):
     return not (a[0] < 0 or a[0] >= w or a[1] < 0 or a[1] >= h)
 
@@ -20,14 +19,12 @@ def part_one():
     w, h = len(lines[0]), len(lines)
     for y, line in enumerate(lines):
         antanas = re.finditer(r'[a-zA-Z0-9]', line)
-
         for a in antanas:
             pos = (a.span()[0], y)
             for o in frequencies.get(a[0], []):
                 dif = tsub(pos, o)
                 antinodes.add(tadd(pos, dif))
                 antinodes.add(tsub(o, dif))
-
             # add the antanas to the frequency dictionary
             frequencies[a[0]] = frequencies.get(a[0], []) + [pos]
         # filter all antinode within bounds
@@ -46,7 +43,6 @@ def part_two():
     w, h = len(lines[0]), len(lines)
     for y, line in enumerate(lines):
         antanas = re.finditer(r'[a-zA-Z0-9]', line)
-
         for a in antanas:
             pos = (a.span()[0], y)
             for o in frequencies.get(a[0], []):
