@@ -7,8 +7,6 @@ def parse_input():
     with open('{0}/input/day{1}.txt','r') as input_file:
         return ...
 
-data = parse_input()
-
 def part_one():
     ...
 
