@@ -37,7 +37,7 @@ def part_one():
                 antinodes_out_bounds.add(an)
         for anob in antinodes_out_bounds:
             antinodes.discard(anob)
-        print(len(antinodes))
+    print(len(antinodes))
 
 def part_two():
     lines = parse_input()
@@ -52,11 +52,11 @@ def part_two():
             for o in frequencies.get(a[0], []):
                 dif = tsub(pos, o)
                 n1 = pos
-                while in_bounds(n1):
+                while in_bounds(n1, w, h):
                     antinodes.add(n1)
                     n1 = tadd(n1, dif)
                 n2 = tsub(pos, dif)
-                while in_bounds(n2):
+                while in_bounds(n2, w, h):
                     antinodes.add(n2)
                     n2 = tsub(n2, dif)
             # add the antanas to the frequency dictionary
