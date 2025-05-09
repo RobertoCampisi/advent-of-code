@@ -27,7 +27,7 @@ def rec(d, towels, memory):
 def part_one():
     towels, designs = parse_input()
     towel_mem = dict()
-    res = -1             
+    res = 0
     for i,d in enumerate(designs):
         if rec(d,towels,towel_mem) > 0:
             res += 1
@@ -36,7 +36,7 @@ def part_one():
 def part_two():
     towels, designs = parse_input()
     towel_mem = dict()
-    res = -1             
+    res = 0
     for i,d in enumerate(designs):
         n = rec(d,towels,towel_mem)
         res += n
