@@ -329,13 +329,13 @@ def fetch_previous_submission(year, day):
 def submit_answer(year, day, part, answer):
     if state['token'] == '':
         raise Exception("missing session token. please add the <session cookie> to token in the savefile or use token <session_cookie>.")
-    data = urllib.parse.urlencode({'level':part, 'answer':answer})    
+    data = urllib.parse.urlencode({'level':part, 'answer':answer}).encode("utf-8")    
     req = urllib.request.Request('https://adventofcode.com/{}/day/{}/answer'.format(year,day),data=data)
     req.add_header('Cookie', 'session='+state['token'])
     with urllib.request.urlopen(req) as response:
         html = response.read().decode("utf-8")
         #todo extract response msg and return this
-        if re.search('That\'s the'): #assume answer is correct TODO:verify this
+        if re.search('That\'s the', html): #assume answer is correct TODO:verify this
             state['data'][year][day]['answer_p{}'.format(part)] = answer
             save()
             return True
