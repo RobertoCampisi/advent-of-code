@@ -26,6 +26,22 @@ def get_neighbors(grid, pos):
 def get_dist(p1, p2):
     return abs(p1.real - p2.real) + abs(p1.imag - p2.imag)
 
+def flood(grid, start):
+    iteration_set = set(get_neighbors(grid, start))
+    distances = {start: 0}
+    next = set()
+    distance = 1
+    while iteration_set:
+        while iteration_set:
+            current_pos = iteration_set.pop(0)
+            if current_pos not in distances:
+                distances[current_pos] = distance
+                for e in get_neighbors(grid, current_pos):
+                    next.add(e)
+        iteration_set = next
+        distance += 1
+    return distances
+
 def astar(grid, start, goal):
     open_set = [Node(start)]
     closed_set = set()
