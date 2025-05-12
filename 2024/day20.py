@@ -1,8 +1,10 @@
 import sys
 import os
+import math
+from functools import cache
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
-from my_utils import astar
+from my_utils import astar, flood
 
 def parse_input():
     with open('2024/input/day20.txt','r') as input_file:
@@ -23,13 +25,49 @@ def parse_input():
                     racetrack[i+j*1j] = 0
         return racetrack, start, end
 
+@cache
+def diamond(radius):
+    point_cloud = []
+    for i in range(-radius-1,radius+1):
+        for j in range(-radius-1,radius+1):
+            if i+j <= radius:
+                point_cloud.append(i + j * 1j)
+    return point_cloud
+
 def part_one():
     racetrack, start, end = parse_input()
-    base_len = len(astar(racetrack, start, end))
-    print(base_len) 
+    base_path = astar(racetrack, start, end)
+    base_len = len(base_path)
+    shortest = flood(racetrack,end)
+    cheat_histogram = dict()
+    current_distance = 0
+    for pos in base_path:
+        for end_point in [pos+x for x in [2,-2,2j,-2j]]:
+            if end_point in shortest:
+                if shortest[end_point] + current_distance < base_len - 100:
+                    i = base_len - (shortest[end_point] + current_distance)
+                    cheat_histogram[i] = cheat_histogram.get(i, 0) + 1
+        current_distance += 1
+    print(sum(cheat_histogram.values()))
+    
 
 def part_two():
-    ...
+    racetrack, start, end = parse_input()
+    base_path = astar(racetrack, start, end)
+    base_len = len(base_path)
+    shortest = flood(racetrack,end)
+    distance_taken = flood(racetrack,start)
+    distance_taken = dict(filter(lambda x:x[1] <= base_len - 20, distance_taken.items()))
+    cheat_histogram = dict()
+    for pos in distance_taken.keys():
+        for end_point in [pos + x for x in diamond(20)]: 
+            if end_point in shortest:
+                d = int(abs(end_point.real - pos.real) + abs(end_point.imag - pos.imag))
+                if distance_taken[pos] + shortest[end_point] + d <= base_len - 100:
+                    i = base_len - distance_taken[pos] - shortest[end_point] - d
+                    cheat_histogram[i] = cheat_histogram.get(i, 0) + 1
+    #print(dict(sorted(cheat_histogram.items())))
+    print(sum(cheat_histogram.values()))
 
 #simple benchmark function.
 def benchmark(func, n):
