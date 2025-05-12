@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from my_utils import astar, flood
 
 def parse_input():
-    with open('2024/test/day20.txt','r') as input_file:
+    with open('2024/input/day20.txt','r') as input_file:
         start = 0
         end = 0
         lines = input_file.read().split("\n")
@@ -57,13 +57,13 @@ def part_two():
     base_len = len(base_path)
     shortest = flood(racetrack,end)
     distance_taken = flood(racetrack,start)
-    distance_taken = dict(filter(lambda x:x[1] <= base_len - 50, distance_taken.items()))
+    distance_taken = dict(filter(lambda x:x[1] <= base_len - 20, distance_taken.items()))
     cheat_histogram = dict()
-    for pos in distance_taken:
-        for end_point in [pos + x for x in diamond(20)]:
+    for pos in distance_taken.keys():
+        for end_point in [pos + x for x in diamond(20)]: 
             if end_point in shortest:
                 d = int(abs(end_point.real - pos.real) + abs(end_point.imag - pos.imag))
-                if distance_taken[pos] + shortest[end_point] + d <= base_len - 50:
+                if distance_taken[pos] + shortest[end_point] + d <= base_len - 100:
                     i = base_len - distance_taken[pos] - shortest[end_point] - d
                     cheat_histogram[i] = cheat_histogram.get(i, 0) + 1
     #print(dict(sorted(cheat_histogram.items())))
