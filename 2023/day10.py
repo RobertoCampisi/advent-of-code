@@ -7,12 +7,14 @@ def parse_input():
     with open('2023/input/day10.txt','r') as input_file:
         pipes = dict()
         start = 0
-        for j,line in enumerate(input_file.read().split('\n')):
+        lines = input_file.read().split('\n')
+        width, height = len(lines[0]), len(lines)
+        for j,line in enumerate(lines):
             for i, symbol in enumerate(line):
                 pipes[i+j*1j] = symbol
                 if symbol == 'S':
                     start = i+j*1j
-        return pipes, start
+        return pipes, start, width, height
 
 def verify_connection(grid, cases, positions):
     res = []
@@ -35,10 +37,10 @@ def get_neighbors(grid, pos):
   
 
 def part_one():
-    pipes, start, _, _ = parse_input()
-    iteration_set = set(get_neighbors(pipes, start))
+    pipes, start, _ , _ = parse_input()
+    iteration_set = set(get_neighbors(pipes, start)) #flood both ways
     distances = {start: 0}
-    next = set()
+    next_set = set()
     current_distance = 1
     while iteration_set:
         while iteration_set:
@@ -46,35 +48,39 @@ def part_one():
             if current_pos not in distances:
                 distances[current_pos] = current_distance
                 for e in get_neighbors(pipes, current_pos):
-                    next.add(e)
-        iteration_set = next
-        next = set()
+                    next_set.add(e)
+        iteration_set = next_set
+        next_set = set()
         current_distance += 1
     print(max(distances.values()))
 
 def part_two():
-    pipes, start = parse_input()
-    iteration_set = set(get_neighbors(pipes, start))
+    pipes, start, width, height = parse_input()
+    iteration_set = set(get_neighbors(pipes, start)[1:]) #make sure the flood only goes into one direction
     loop = []
-    next = set()
+    next_set = set()
     while iteration_set:
         while iteration_set:
             current_pos = iteration_set.pop()
             if current_pos not in loop:
                 loop.append(current_pos)
                 for e in get_neighbors(pipes, current_pos):
-                    next.add(e)
-        iteration_set = next
-        next = set()
-    #print(loop)
-    inside = dict()
-    for x in pipes.keys():
-        hor_ray = len(list(filter(lambda i: (x - i) in loop, range(0, int(x.real)))))
-        ver_ray = len(list(filter(lambda j: (x - j*1j) in loop , range(0, int(x.imag)))))
-        if hor_ray % 2 == 1 and ver_ray % 2 == 1:
-            inside[x] = True
-    print(inside)
-    print(len(inside))
+                    next_set.add(e)
+        iteration_set = next_set
+        next_set = set()
+    #calculate Area using the shoelace theorem
+    total_area = 0
+    for i in range(0,len(loop)):
+        a, b = int(loop[i].real), int(loop[i].imag)
+        c, d = int(loop[(i+1)%len(loop)].real), int(loop[(i+1)%len(loop)].imag)
+        total_area += (a*d-b*c) #determinant
+    total_area = abs(total_area) // 2
+    #applying Pick theorem to calculate the inner points
+    inner = total_area + 1 - len(loop)//2
+    print(inner)
+    #for j in range(0, height):
+    #   print(''.join([pipes[i+j*1j] if (i+j*1j) not in inside else 'I' for i in range(0, width)]))
+    #   print(''.join(['I' if row_part[i + j * 1j] else '.' for i in range(0, width)]))
 
 
 #simple benchmark function.
