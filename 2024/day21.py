@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 def parse_input():
     with open('2024/input/day21.txt','r') as input_file:
-        return input_file.read().split('\n')[:-1]
+        return input_file.read().split('\n')
 
 def path(subsequence):
     (y,x), (Y,X) = [divmod('789456123 0A<v>'.find(t), 3) for t in subsequence]
