@@ -41,11 +41,34 @@ def part_one():
     print(sum(find_reflect(p1) + find_reflect(p2) * 100 for p1,p2 in patterns))
 
 def part_two():
-    patterns = parse_input()
+    patterns = parse_input()[0:4]
+    res = 0
     for p1,p2 in patterns:
+        #find candidates for potential smudges
+        old_relection = [find_reflect(p1),find_reflect(p2)]
         candidates = dict()
-        for a,b in combinations(p1,2):
-            candidates[(a,b)] = (a-b).bit_count == 1
+        for a,b in combinations(range(0,len(p1)),2):
+            candidates[(a,b)] = abs(p1[a]-p1[b]).bit_count() == 1
+        candidates2 = dict()
+        for a,b in combinations(range(0,len(p2)),2):
+            candidates2[(a,b)] = abs(p2[a]-p2[b]).bit_count() == 1
+        #find new relection
+        def smudge_reflect(_candidates,_p):
+            _res = []
+            for smudge in [k for k, v in _candidates.items() if v]:
+                s1, s2 = smudge
+                smudged1 = _p.copy()
+                smudged1[s1] = _p[s2]
+                smudged2 = _p.copy()
+                smudged2[s2] = _p[s1]
+                smudges_res = [find_reflect(smudged1),find_reflect(smudged2)]
+                for sr in smudges_res:
+                    if sr not in old_relection or sr != -1:
+                        _res.append(sr)
+            return _res
+        print(smudge_reflect(candidates,p1))
+        print(smudge_reflect(candidates2,p2))
+        #found multiple smudge reflections, this is probably due to a misunderstanding of the puzzle.
 
 #simple benchmark function.
 def benchmark(func, n):
