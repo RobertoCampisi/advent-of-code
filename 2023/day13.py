@@ -1,5 +1,7 @@
 import sys
 import os
+from itertools import combinations
+
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
 def transpose(x):
@@ -39,7 +41,11 @@ def part_one():
     print(sum(find_reflect(p1) + find_reflect(p2) * 100 for p1,p2 in patterns))
 
 def part_two():
-    ...
+    patterns = parse_input()
+    for p1,p2 in patterns:
+        candidates = dict()
+        for a,b in combinations(p1,2):
+            candidates[(a,b)] = (a-b).bit_count == 1
 
 #simple benchmark function.
 def benchmark(func, n):
