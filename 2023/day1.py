@@ -9,7 +9,7 @@ def parse_input():
         return input_file.read().split('\n')
 
 def to_int(match):
-    match str:
+    match match:
         case 'one': return 1
         case 'two': return 2
         case 'three': return 3
@@ -30,7 +30,7 @@ def part_two():
     lines = parse_input()
     digits_pattern = re.compile(r'\d|one|two|three|four|five|six|seven|eight|nine')
     digits_pattern_r = re.compile(r'\d|eno|owt|eerht|ruof|evif|xis|neves|thgie|enin')
-    calibration_values = [to_int(re.search(digits_pattern, l.strip())[0])*10 + to_int(re.search(digits_pattern_r, l.strip()[::-1])[0]) for l in lines]
+    calibration_values = [to_int(re.search(digits_pattern, l.strip())[0])*10 + to_int(re.search(digits_pattern_r, l.strip()[::-1])[0][::-1]) for l in lines]
     print(sum(calibration_values))
 
 #simple benchmark function.
