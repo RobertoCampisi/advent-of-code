@@ -80,18 +80,32 @@ def part_one():
     
 def part_two():
     r_rocks, sq_rocks, width, height = parse_input()
-    #prev = deepcopy(r_rocks)
-    for _ in range(1000000000):
+    prevs = []
+    cycle_counter = 0
+    cycle_start = 0
+    cycle_length = 0
+    cycle_max = 1000000000
+    for n in range(1000000000):
         r_rocks = fall_north(r_rocks, sq_rocks, width, height)
         r_rocks = fall_west(r_rocks, sq_rocks, width, height)
         r_rocks = fall_south(r_rocks, sq_rocks, width, height)
         r_rocks = fall_east(r_rocks, sq_rocks, width, height)
-        #if r_rocks == prev:
-        #    print("SHORTCUT FOUND")
-        #    break
-        #prev = deepcopy(r_rocks)
+        if r_rocks in prevs:
+            if cycle_start == 0:
+                for i in range(len(prevs))[::-1]:
+                    if prevs[i] == r_rocks:
+                      cycle_start = i
+                      cycle_length = n -i
+                      cycle_max = i + cycle_length
+            cycle_counter += 1
+            if cycle_counter > cycle_max:
+                break
+        prevs.append(deepcopy(r_rocks))
+    print(cycle_start, cycle_length, cycle_max)
+    print(cycle_start + (1000000000%cycle_length))
+    final_r_rocks = prevs[cycle_start + (1000000000%cycle_length)]
     total_weight = 0
-    for (x,y), v in r_rocks.items():
+    for (x,y), v in final_r_rocks.items():
         total_weight += (height - y) * v
     print(total_weight)
         
