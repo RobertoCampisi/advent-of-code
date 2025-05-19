@@ -77,7 +77,12 @@ def part_one():
     print(end_distances)
     print(min(end_distances))
 
-
+    path = [previous[(end,-1j)]]
+    while path[-1] != (start,1):
+        path.append(previous[path[-1]])
+    #print(path)
+    for y in range(h):
+        print(''.join(['#' if maze[x+y*1j] == 1 else 'P' if any((x+y*1j,d) in path for d in [1,-1,1j,-1j]) else '.' for x in range(w)]))
 
 
 
