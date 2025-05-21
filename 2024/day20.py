@@ -30,7 +30,7 @@ def diamond(radius):
     point_cloud = []
     for i in range(-radius-1,radius+1):
         for j in range(-radius-1,radius+1):
-            if i+j <= radius:
+            if abs(i)+abs(j) <= radius:
                 point_cloud.append(i + j * 1j)
     return point_cloud
 
@@ -57,7 +57,7 @@ def part_two():
     base_len = len(base_path)
     shortest = flood(racetrack,end)
     distance_taken = flood(racetrack,start)
-    distance_taken = dict(filter(lambda x:x[1] <= base_len - 20, distance_taken.items()))
+    distance_taken = dict(filter(lambda x:x[1] <= base_len - 100, distance_taken.items()))
     cheat_histogram = dict()
     for pos in distance_taken.keys():
         for end_point in [pos + x for x in diamond(20)]: 
@@ -66,7 +66,8 @@ def part_two():
                 if distance_taken[pos] + shortest[end_point] + d <= base_len - 100:
                     i = base_len - distance_taken[pos] - shortest[end_point] - d
                     cheat_histogram[i] = cheat_histogram.get(i, 0) + 1
-    #print(dict(sorted(cheat_histogram.items())))
+    #for k,v in dict(sorted(cheat_histogram.items())).items():
+    #    print('There are {} cheats that save {} picoseconds.'.format(v,k))
     print(sum(cheat_histogram.values()))
 
 #simple benchmark function.
