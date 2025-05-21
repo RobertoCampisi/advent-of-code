@@ -14,7 +14,7 @@ def parse_input():
             for i,ch in enumerate(list(row)):
                 maze[i+j*1j] = 1 if ch == '#' else 0
         return maze, w, h
-    
+  
 def part_one():
     maze, w, h = parse_input()
     start = 1+(h-2)*1j
@@ -35,26 +35,23 @@ def part_one():
             pos, old_d = queue.pop(0) 
             for d in [1,-1,1j,-1j]:
                 i = 1
-                base_cost = 0 if old_d == d else 1000
                 while (grid[pos + d*i] != 1 and all((grid[pos+d*(i-1)+p] == 1 or i == 1 for p in perpendicular[d]))) and (pos + d*i,d) not in visited:
                     visited.add((pos+d*i,d))
                     i += 1
                 if i > 1:
                     if old_d != d:
                         nodes.add((pos,d))
-                        edges.append(((pos,old_d),(pos,d),base_cost))
+                        edges.append(((pos,old_d),(pos,d),1000))
                     nodes.add((pos+d*(i-1),d))
                     edges.append(((pos,d),(pos+d*(i-1),d),(i-1)))
                     queue.append((pos+d*(i-1),d))
-        #for y in range(h):
-        #    print(''.join(['#' if maze[x+y*1j] == 1 else 'V' if any((x+y*1j,d) in visited for d in [1,-1,1j,-1j]) else '.' for x in range(w)]))
+                    for d2 in [1,-1,1j,-1j]:
+                            if d2 != d:
+                                if (pos+d*(i-1), d2) in visited:
+                                    edges.append(((pos+d*(i-1),d),(pos+d*(i-1),d2),1000))
     #create graph
-    prance(maze,start,1)    
-    print('nodes: ', len(nodes))
-    print('edges: ', len(edges))
-    print('visited: ',len(visited))
-    #print(is_node(maze,start))
-    #TODO: DIJKSTRA ALGO HERE
+    prance(maze,start,1)  
+    #Dijkstra algorithm  
     previous = {n: None for n in nodes}
     distance = {n: inf for n in nodes}
     distance[(start,1)] = 0
@@ -74,21 +71,96 @@ def part_one():
                     distance[u[1]] = alt
                     previous[u[1]] = min_cand
     end_distances = [distance[(end,d)] if (end,d) in distance else inf for d in [1,-1,1j,-1j]]
-    print(end_distances)
     print(min(end_distances))
 
-    path = [previous[(end,-1j)]]
-    while path[-1] != (start,1):
-        path.append(previous[path[-1]])
-    #print(path)
-    for y in range(h):
-        print(''.join(['#' if maze[x+y*1j] == 1 else 'P' if any((x+y*1j,d) in path for d in [1,-1,1j,-1j]) else '.' for x in range(w)]))
-
-
-
+    #path = [previous[(end,-1j)]]
+    #while path[-1] != (start,1):
+    #    path.append(previous[path[-1]])
 
 def part_two():
-    ...
+    maze, w, h = parse_input()
+    start = 1+(h-2)*1j
+    end = (w-2)+1j
+
+    edges = []
+    nodes = set()
+    visited = set()
+
+    nodes.add((start,1))
+    visited.add(start)
+
+    def prance(grid, start, d):
+        perpendicular = {1:(-1j,1j),-1:(1j,-1j),1j:(1,-1),-1j:(-1,1)}
+        counter = 0
+        queue = [(start,d)]
+        while len(queue) > 0:
+            pos, old_d = queue.pop(0) 
+            for d in [1,-1,1j,-1j]:
+                i = 1
+                while (grid[pos + d*i] != 1 and all((grid[pos+d*(i-1)+p] == 1 or i == 1 for p in perpendicular[d]))) and (pos + d*i,d) not in visited:
+                    visited.add((pos+d*i,d))
+                    i += 1
+                if i > 1:
+                    if old_d != d:
+                        nodes.add((pos,d))
+                        edges.append(((pos,old_d),(pos,d),1000))
+                    nodes.add((pos+d*(i-1),d))
+                    edges.append(((pos,d),(pos+d*(i-1),d),(i-1)))
+                    queue.append((pos+d*(i-1),d))
+                    for d2 in [1,-1,1j,-1j]:
+                            if d2 != d:
+                                if (pos+d*(i-1), d2) in visited:
+                                    edges.append(((pos+d*(i-1),d),(pos+d*(i-1),d2),1000))
+    #create graph
+    prance(maze,start,1)  
+    #Dijkstra algorithm  
+    previous = {n: None for n in nodes}
+    distance = {n: inf for n in nodes}
+    distance[(start,1)] = 0
+    queue = nodes
+    while len(queue) > 0:
+        min_dist = inf
+        min_cand = None
+        for k in queue:
+            if distance[k] < min_dist:
+                min_dist = distance[k]
+                min_cand = k
+        if min_cand is not None:
+            queue.remove(min_cand)
+            for u in filter(lambda x: x[0] == min_cand, edges):
+                alt = distance[min_cand] + u[2]
+                if alt < distance[u[1]]:
+                    distance[u[1]] = alt
+                    previous[u[1]] = [min_cand]
+                elif alt == distance[u[1]]:
+                    previous[u[1]].append(min_cand)
+    #end_distances = [distance[(end,d)] if (end,d) in distance else inf for d in [1,-1,1j,-1j]]
+    #print(min(end_distances))
+
+    visited = set()
+    best_paths_queue = []
+    for  d in [1,-1,1j,-1j]:
+        for v in previous[(end,d)]:
+            if v is not None:
+                p2,d2 = v
+                best_paths_queue.append(((end,d),(p2,d2)))
+    print(best_paths_queue)
+    while len(best_paths_queue) > 0:
+        cand_bpq = best_paths_queue.pop(0)
+        #print(cand_bpq)
+        if cand_bpq[1] is not None:
+            diff_x = int(cand_bpq[0][0].real - cand_bpq[1][0].real)
+            diff_y = int(cand_bpq[0][0].imag - cand_bpq[1][0].imag)
+            for i in range(abs(diff_x)+1):
+                visited.add((cand_bpq[0][0] + (diff_x / abs(diff_x)) * i))
+            for i in range(abs(diff_y)+1):
+                visited.add((cand_bpq[0][0] + (diff_y / abs(diff_y)) * i * 1j))
+            if previous[cand_bpq[1]] is not None:
+                best_paths_queue.extend([(cand_bpq[1], v) for v in previous[cand_bpq[1]] if v is not None])
+    print(len(visited))
+
+    for y in range(h):
+        print(''.join(['#' if maze[x+y*1j] == 1 else 'O' if x+y*1j in visited else '.' for x in range(w)]))
 
 #simple benchmark function.
 def benchmark(func, n):
