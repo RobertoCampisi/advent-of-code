@@ -237,8 +237,8 @@ def create(year, days, part, number):
         if day in state['data'][year]:
             print('Skipped, ', day, 'for year ',year,' already exists in JSON file')
         else:
-            template = open('template.py', 'r').read().format(year,day)
-            fname = '{}/day{}.py'.format(year,day)
+            template = open('template.py', 'r').read().format(year,int(day))
+            fname = '{}/day{:02d}.py'.format(year,int(day))
             if not os.path.isfile(fname):
                 with open(fname,'w') as f:
                     f.write(template)
@@ -267,7 +267,7 @@ def fetch(year, days, part, number):
                 if response.status == 200:
                     html = response.read().decode("utf-8")
                     if 'Puzzle inputs differ by user. Please log in to get your puzzle input.' not in html:
-                        f = open('{}/input/day{}.txt'.format(year, day), "w")
+                        f = open('{}/input/day{:02d}.txt'.format(year, int(day)), "w")
                         f.write(html[:-1])#ignore new_line character at the end
                     else:
                         raise ValueError("Received bad response")
@@ -294,15 +294,15 @@ def run(year, days, part, number):
     for day in days:
         match part:
             case 0:
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 print(err) if err else print(out)
-                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_two".format(year, int(day)))
                 print(err) if err else print(out)
             case 1:
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 print(err) if err else print(out)
             case 2:
-                (out, err) = run_solution("python {}/day{}.py part_two".format(year,day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_two".format(year, int(day)))
                 print(err) if err else print(out)
             case _:
                 raise Exception('invalid argument')
@@ -354,7 +354,7 @@ def submit(year, days, part, number):
         match part:
             case 0:
                 on_cooldown = False
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 if err:
                     print(err)
                     raise RuntimeError
@@ -373,7 +373,7 @@ def submit(year, days, part, number):
                         else:
                             print("\"{}\", sadly, is incorrect. ".format(out))
                 if not on_cooldown:
-                    (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                    (out, err) = run_solution("python {}/day{:02d}.py part_two".format(year, int(day)))
                     if err:
                         print(err)
                         raise RuntimeError
@@ -393,7 +393,7 @@ def submit(year, days, part, number):
                 else: 
                     raise Exception('The submission of day {day} part 1 was incorrect. \nCurrent submissions are on a five minute timeout. Please wait before resubmitting.')
             case 1:
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 if err:
                     print(err)
                     raise RuntimeError
@@ -411,7 +411,7 @@ def submit(year, days, part, number):
                         else:
                             print("\"{}\", sadly, is incorrect. ".format(out))
             case 2:
-                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                (out, err) = run_solution("python {}/day{}.py part_two".format(year, int(day)))
                 if err:
                     print(err)
                     raise RuntimeError
@@ -444,25 +444,25 @@ def benchmark(year, days, part, number):
     for day in days:
         match part:
             case 0:
-                (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
+                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_one {}".format(year, int(day), number))
                 print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
                 total_milliseconds += float(out) if not err else 0.0
                 if number >= 10: #treshold to store benchmark results
                     state['data'][year][day]['p1_prev_bench'] = out + ' ms'
-                (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
+                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_two {}".format(year, int(day), number))
                 print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
                 total_milliseconds += float(out)  if not err else 0.0
                 if number >= 10: #treshold to store benchmark results
                     state['data'][year][day]['p2_prev_bench'] = out + ' ms'
 
             case 1:
-                (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
+                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_one {}".format(year, int(day), number))
                 print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
                 total_milliseconds += float(out)  if not err else 0.0
                 if number >= 10: #treshold to store benchmark results
                     state['data'][year][day]['p1_prev_bench'] = out + ' ms'
             case 2:
-                (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
+                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_two {}".format(year, int(day), number))
                 print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
                 total_milliseconds += float(out)  if not err else 0.0
                 if number >= 10: #treshold to store benchmark results
