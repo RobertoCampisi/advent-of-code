@@ -11,7 +11,7 @@ Currently I am working on making an command line interface to facilitate comunic
 ---
 <!-- Badges of stars: start -->
 [![AoC 2023](https://img.shields.io/badge/2023-⭐%2026-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2023)
-[![AoC 2024](https://img.shields.io/badge/2024-⭐%2045-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2024)  
+[![AoC 2024](https://img.shields.io/badge/2024-⭐%2048-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2024)  
 <!-- Badges of stars: end -->
 ---
 
@@ -24,5 +24,5 @@ star ⭐️ so the maximum amount of stars for a year is `50`.
 | Year | Stars | Advent of Code Link |
 | :--: | :---: | :--: |
 | [2023](year/2023) | ⭐️26  | https://adventofcode.com/2023 |
-| [2024](year/2024) | ⭐️45  | https://adventofcode.com/2024 |
+| [2024](year/2024) | ⭐️48  | https://adventofcode.com/2024 |
 <!-- Table summary of years: end -->
