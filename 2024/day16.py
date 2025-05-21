@@ -137,30 +137,34 @@ def part_two():
     #end_distances = [distance[(end,d)] if (end,d) in distance else inf for d in [1,-1,1j,-1j]]
     #print(min(end_distances))
 
-    visited = set()
+    end_distances = [distance[(end,d)] if (end,d) in distance else inf for d in [1,-1,1j,-1j]]
+    shortest_distance = min(end_distances)
+
+    visited = set([end])
     best_paths_queue = []
     for  d in [1,-1,1j,-1j]:
-        for v in previous[(end,d)]:
-            if v is not None:
-                p2,d2 = v
-                best_paths_queue.append(((end,d),(p2,d2)))
-    print(best_paths_queue)
+        if distance[(end,d)] == shortest_distance:
+            for v in previous[(end,d)]:
+                if v is not None:
+                    p2,d2 = v
+                    best_paths_queue.append(((end,d),(p2,d2)))
     while len(best_paths_queue) > 0:
         cand_bpq = best_paths_queue.pop(0)
         #print(cand_bpq)
         if cand_bpq[1] is not None:
             diff_x = int(cand_bpq[0][0].real - cand_bpq[1][0].real)
             diff_y = int(cand_bpq[0][0].imag - cand_bpq[1][0].imag)
-            for i in range(abs(diff_x)+1):
-                visited.add((cand_bpq[0][0] + (diff_x / abs(diff_x)) * i))
-            for i in range(abs(diff_y)+1):
-                visited.add((cand_bpq[0][0] + (diff_y / abs(diff_y)) * i * 1j))
+            for i in range(abs(diff_x)):
+                visited.add((cand_bpq[1][0] + (diff_x / abs(diff_x)) * i))
+            for i in range(abs(diff_y)):
+                visited.add((cand_bpq[1][0] + (diff_y / abs(diff_y)) * i * 1j))
             if previous[cand_bpq[1]] is not None:
                 best_paths_queue.extend([(cand_bpq[1], v) for v in previous[cand_bpq[1]] if v is not None])
     print(len(visited))
 
-    for y in range(h):
-        print(''.join(['#' if maze[x+y*1j] == 1 else 'O' if x+y*1j in visited else '.' for x in range(w)]))
+    #for y in range(h):
+    #    #
+    #    print(''.join(['#' if maze[x+y*1j] == 1 else 'O' if x+y*1j in visited else '.' for x in range(w)]))
 
 #simple benchmark function.
 def benchmark(func, n):
