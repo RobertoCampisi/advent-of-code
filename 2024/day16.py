@@ -150,7 +150,6 @@ def part_two():
                     best_paths_queue.append(((end,d),(p2,d2)))
     while len(best_paths_queue) > 0:
         cand_bpq = best_paths_queue.pop(0)
-        #print(cand_bpq)
         if cand_bpq[1] is not None:
             diff_x = int(cand_bpq[0][0].real - cand_bpq[1][0].real)
             diff_y = int(cand_bpq[0][0].imag - cand_bpq[1][0].imag)
@@ -162,9 +161,6 @@ def part_two():
                 best_paths_queue.extend([(cand_bpq[1], v) for v in previous[cand_bpq[1]] if v is not None])
     print(len(visited))
 
-    #for y in range(h):
-    #    #
-    #    print(''.join(['#' if maze[x+y*1j] == 1 else 'O' if x+y*1j in visited else '.' for x in range(w)]))
 
 #simple benchmark function.
 def benchmark(func, n):
