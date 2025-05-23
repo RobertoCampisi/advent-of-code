@@ -479,20 +479,28 @@ def benchmark(year, days, part, number):
 #cd on last submission. will not be updated after submission has been verified as correct.
 
 def update_README():
-    with open('README.md','r') as f:
+    summary = dict()
+    table_rows = ['| Year | Stars | Advent of Code Link |','| :--: | :---: | :--: |']
+    badges = []
+    for year,solutions in state['data'].items():
+        star_count = 0
+        for day,solution_data in solutions.items():
+            if solution_data['answer_p1'] is not None: star_count += 1
+            if solution_data['answer_p2'] is not None: star_count += 1
+        summary[year] = star_count
+    for y,count in sorted(summary.items()):
+        badges.append('[![AoC '+y+'](https://img.shields.io/badge/'+y+'-⭐%20'+str(count)+'-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/'+y+')')
+        table_rows.append('| ['+y +']('+y+') | ⭐️'+str(count)+' | https://adventofcode.com/'+y+'|')
+    with open('README.md','r+', encoding="utf-8") as f:
         current = f.read()
-        summary = dict()
-        table_rows = ['| Year | Stars | Advent of Code Link |\n','| :--: | :---: | :--: |\n']
-        badges = []
-        for year_overview in save['data']:
-            year = str(year_data['year'])
-            star_count = str(0) #year_data['solutions']
-            summary[year] = star_count
-        for entry in summary:
-            badges.append('[![AoC '+y+'](https://img.shields.io/badge/'+y+'-⭐%20'+y+'-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/'+y+')')
-            table_rows.append('| ['+y +']('+y+') | ⭐️'+star_count+' | https://adventofcode.com/'+y+'|\n')
+        current = re.sub(r'<!-- sum of stars 1: begin -->.*<!-- sum of stars 1: end -->', '<!-- sum of stars 1: begin -->(⭐ '+str(sum(summary.values()))+')<!-- sum of stars 1: end -->', current)
+        current = re.sub(r'(?s)<!-- Badges of stars: begin -->.*<!-- Badges of stars: end -->', '<!-- Badges of stars: begin -->\n'+'\n'.join(badges)+'\n<!-- Badges of stars: end -->', current)
+        current = re.sub(r'(?s)<!-- Table summary of years: begin -->.*<!-- Table summary of years: end -->', '<!-- Table summary of years: begin -->\n'+'\n'.join(table_rows)+'\n<!-- Table summary of years: end -->',current)
+        f.seek(0)
+        f.write(current)
+        f.truncate()
             
-        print(badges)
+        
 
 
 
