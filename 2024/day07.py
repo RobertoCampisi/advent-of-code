@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
 
 def parse_input():
-    with open('2024/input/day7.txt','r') as input_file:
+    with open('2024/input/day07.txt','r') as input_file:
         lines = input_file.read().strip().split("\n")
         return [(int(line.split(':')[0]), list(map(int, line.split(':')[1].split()))) for line in lines]
 

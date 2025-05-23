@@ -4,7 +4,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
 
 def parse_input():
-    with open('2024/input/day9.txt','r') as input_file:
+    with open('2024/input/day09.txt','r') as input_file:
         line = input_file.read().strip().split("\n")[0]
         data = dict()
         id_counter = 0

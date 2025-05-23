@@ -5,37 +5,30 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
 from my_utils import tadd
 
-directions = [(0,-1),(1,0),(0,1),(-1,0)]
-
 def parse_input():
-    with open('2024/input/day6.txt','r') as input_file:
+    with open('2024/input/day06.txt','r') as input_file:
         lines = input_file.read().strip().split("\n")
         width = len(lines[0])
         height = len(lines)
         start_position = (0, 0)
-        return width, height, lines
-
-def sort_dict_values(d):
-    for k in d.keys():
-        d[k] = sorted(d[k])
+        rows = dict()
+        cols = dict()
+        for i,line in enumerate(lines):
+            if re.search(r'#', line) is not None:
+                obstacles = re.finditer(r'#', line)
+                for o in obstacles:
+                    j = o.span()[0]
+                    rows[i] = rows.get(i, []) + [j]
+                    cols[j] = cols.get(j, []) + [i]
+            if re.search(r'\^', line) is not None:
+                start_position = (re.search(r'\^', line).span()[0],i)
+        return width, height, lines, rows, cols, start_position
 
 def part_one():
-    width, height, lines = parse_input()
-    rows = dict()
-    cols = dict()
-    direction = 0
-    for i,line in enumerate(lines):
-        if re.search(r'#', line) is not None:
-            obstacles = re.finditer(r'#', line)
-            for o in obstacles:
-                j = o.span()[0]
-                rows[i] = rows.get(i, []) + [j]
-                cols[j] = cols.get(j, []) + [i]
-        if re.search(r'\^', line) is not None:
-            start_position = (re.search(r'\^', line).span()[0],i)
-
+    width, height, lines, rows, cols, start_position = parse_input()
     #predict path length
     pos = start_position
+    direction = 0 # 0 = up, 1 = right, 2=down, 3=left
     counter = 0
     visited = set()
     visited.add(start_position)
@@ -109,30 +102,10 @@ def part_one():
     print(len(visited))
 
 def part_two():
-    width, height, lines = parse_input()
-    start_position = (0, 0)
-    direction = 0  # 0 = up, 1 = right, 2=down, 3=left
-
-    # construct the rows and cols; sorted by order of construction
-    rows = dict()
-    cols = dict()
-    for i, line in enumerate(lines):
-        if re.search(r'#', line) is not None:
-            obstacles = re.finditer(r'#', line)
-            for o in obstacles:
-                j = o.span()[0]
-                rows[i] = rows.get(i, []) + [j]
-                cols[j] = cols.get(j, []) + [i]
-        if re.search(r'\^', line) is not None:
-            start_position = (re.search(r'\^', line).span()[0], i)
-        print(line)
-
-    print(rows)
-    print(cols)
-
-    print(start_position)
+    width, height, lines, rows, cols, start_position = parse_input()
     # predict path length
     pos = start_position
+    direction = 0 # 0 = up, 1 = right, 2=down, 3=left
     counter = 0
     visited = set()
     visited.add(start_position)
@@ -197,19 +170,7 @@ def part_two():
                 break
 
         direction = (direction + 1) % 4
-        # print(direction, pos)
-
         counter += 1
-
-    # for (x, y) in visited:
-    #    lines[y] = lines[y][:x] + 'X' + lines[y][x + 1:]
-
-    # lines[pos[1]] = lines[pos[1]][:pos[0]] + '^' + lines[pos[1]][pos[0] + 1:]
-
-    # for i, line in enumerate(lines):
-    #    print(line)
-
-    print(len(visited))
 
     # check for potential loops by putting an obstacle on each visited position from the original path.
     total_counter = 0
@@ -233,7 +194,6 @@ def part_two():
                 encountered = False
                 if direction == 0:
                     if x in new_cols:
-                        # print(x, new_cols[x])
                         for o in reversed(new_cols[x]):
                             if o < y:
                                 pos = (x, o + 1)
@@ -247,7 +207,6 @@ def part_two():
                         break
                 elif direction == 1:
                     if y in new_rows:
-                        # print(y,new_rows[y])
                         for o in new_rows[y]:
                             if o > x:
                                 pos = (o - 1, y)
@@ -261,7 +220,6 @@ def part_two():
                         break
                 elif direction == 2:
                     if x in new_cols:
-                        # print(x,new_cols[x])
                         for o in new_cols[x]:
                             if o > y:
                                 pos = (x, o - 1)
@@ -275,7 +233,6 @@ def part_two():
                         break
                 else:
                     if y in new_rows:
-                        # print(y, new_rows[y])
                         for o in reversed(new_rows[y]):
                             if o < x:
                                 pos = (o + 1, y)
@@ -289,9 +246,7 @@ def part_two():
                         break
 
                 direction = (direction + 1) % 4
-                # print(direction, pos)
                 if cycle_counter > 3:
-                    print(v, 'loop found!')
                     total_counter += 1
                     break
                 if len(new_visited) == prev_len_new_visited:
@@ -299,13 +254,6 @@ def part_two():
                 else:
                     prev_len_new_visited = len(new_visited)
                 counter += 1
-
-                # lines[pos[1]] = lines[pos[1]][:pos[0]] + '^' + lines[pos[1]][pos[0] + 1:]
-
-                # for i, line in enumerate(lines):
-                #    print(line)
-                # print(counter)
-
     print(total_counter)
 
 #simple benchmark function.

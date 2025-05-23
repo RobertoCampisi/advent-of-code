@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
 
 def parse_input():
-    with open('2024/input/day4.txt','r') as input_file:
+    with open('2024/input/day04.txt','r') as input_file:
         lines = input_file.readlines()
         w = len(lines[0])+5 #accounting for \n character
         h = len(lines)+6

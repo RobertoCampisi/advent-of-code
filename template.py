@@ -4,7 +4,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
 
 def parse_input():
-    with open('{0}/input/day{1}.txt','r') as input_file:
+    with open('{0}/input/day{1:02d}.txt','r') as input_file:
         return ...
 
 def part_one():

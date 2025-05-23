@@ -5,8 +5,6 @@ import os
 import urllib.request
 import sys
 import time
-
-import subprocess
 from subprocess import Popen, PIPE, STDOUT
 
 #puzzle and solution states are stored in a JSON file
@@ -237,8 +235,8 @@ def create(year, days, part, number):
         if day in state['data'][year]:
             print('Skipped, ', day, 'for year ',year,' already exists in JSON file')
         else:
-            template = open('template.py', 'r').read().format(year,day)
-            fname = '{}/day{}.py'.format(year,day)
+            template = open('template.py', 'r').read().format(year,int(day))
+            fname = '{}/day{:02d}.py'.format(year,int(day))
             if not os.path.isfile(fname):
                 with open(fname,'w') as f:
                     f.write(template)
@@ -267,7 +265,7 @@ def fetch(year, days, part, number):
                 if response.status == 200:
                     html = response.read().decode("utf-8")
                     if 'Puzzle inputs differ by user. Please log in to get your puzzle input.' not in html:
-                        f = open('{}/input/day{}.txt'.format(year, day), "w")
+                        f = open('{}/input/day{:02d}.txt'.format(year, int(day)), "w")
                         f.write(html[:-1])#ignore new_line character at the end
                     else:
                         raise ValueError("Received bad response")
@@ -294,15 +292,15 @@ def run(year, days, part, number):
     for day in days:
         match part:
             case 0:
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year,day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 print(err) if err else print(out)
-                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_two".format(year, int(day)))
                 print(err) if err else print(out)
             case 1:
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 print(err) if err else print(out)
             case 2:
-                (out, err) = run_solution("python {}/day{}.py part_two".format(year,day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_two".format(year, int(day)))
                 print(err) if err else print(out)
             case _:
                 raise Exception('invalid argument')
@@ -354,7 +352,7 @@ def submit(year, days, part, number):
         match part:
             case 0:
                 on_cooldown = False
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 if err:
                     print(err)
                     raise RuntimeError
@@ -373,7 +371,7 @@ def submit(year, days, part, number):
                         else:
                             print("\"{}\", sadly, is incorrect. ".format(out))
                 if not on_cooldown:
-                    (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                    (out, err) = run_solution("python {}/day{:02d}.py part_two".format(year, int(day)))
                     if err:
                         print(err)
                         raise RuntimeError
@@ -393,7 +391,7 @@ def submit(year, days, part, number):
                 else: 
                     raise Exception('The submission of day {day} part 1 was incorrect. \nCurrent submissions are on a five minute timeout. Please wait before resubmitting.')
             case 1:
-                (out, err) = run_solution("python {}/day{}.py part_one".format(year, day))
+                (out, err) = run_solution("python {}/day{:02d}.py part_one".format(year, int(day)))
                 if err:
                     print(err)
                     raise RuntimeError
@@ -411,7 +409,7 @@ def submit(year, days, part, number):
                         else:
                             print("\"{}\", sadly, is incorrect. ".format(out))
             case 2:
-                (out, err) = run_solution("python {}/day{}.py part_two".format(year, day))
+                (out, err) = run_solution("python {}/day{}.py part_two".format(year, int(day)))
                 if err:
                     print(err)
                     raise RuntimeError
@@ -442,31 +440,20 @@ def benchmark(year, days, part, number):
         raise Exception('invalid argument')
     total_milliseconds = 0.0
     for day in days:
+        def run_benchmark(part,save_tag):
+            (out, err) = run_solution("python {}/day{:02d}.py benchmark {} {}".format(year, int(day), part, number))
+            print(err) if err else print("day {} {} took {} milliseconds".format(day, part, out))
+            if number >= 10: #treshold to store benchmark results
+                state['data'][year][day][save_tag] = out + ' ms'
+            return float(out) if not err else 0.0
         match part:
             case 0:
-                (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
-                print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
-                total_milliseconds += float(out) if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p1_prev_bench'] = out + ' ms'
-                (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
-                print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
-                total_milliseconds += float(out)  if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p2_prev_bench'] = out + ' ms'
-
+                total_milliseconds += run_benchmark('part_one','p1_bench')
+                total_milliseconds += run_benchmark('part_two','p2_bench')
             case 1:
-                (out, err) = run_solution("python {}/day{}.py benchmark part_one {}".format(year, day, number))
-                print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
-                total_milliseconds += float(out)  if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p1_prev_bench'] = out + ' ms'
+                total_milliseconds += run_benchmark('part_one','p1_bench')
             case 2:
-                (out, err) = run_solution("python {}/day{}.py benchmark part_two {}".format(year, day, number))
-                print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
-                total_milliseconds += float(out)  if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p2_prev_bench'] = out + ' ms'
+                total_milliseconds += run_benchmark('part_two','p2_bench')
             case _:
                 raise Exception('invalid arguments')
         if number >= 10:
@@ -492,20 +479,28 @@ def benchmark(year, days, part, number):
 #cd on last submission. will not be updated after submission has been verified as correct.
 
 def update_README():
-    with open('README.md','r') as f:
+    summary = dict()
+    table_rows = ['| Year | Stars | Advent of Code Link |','| :--: | :---: | :--: |']
+    badges = []
+    for year,solutions in state['data'].items():
+        star_count = 0
+        for day,solution_data in solutions.items():
+            if solution_data['answer_p1'] is not None: star_count += 1
+            if solution_data['answer_p2'] is not None: star_count += 1
+        summary[year] = star_count
+    for y,count in sorted(summary.items()):
+        badges.append('[![AoC '+y+'](https://img.shields.io/badge/'+y+'-⭐%20'+str(count)+'-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/'+y+')')
+        table_rows.append('| ['+y +']('+y+') | ⭐️'+str(count)+' | https://adventofcode.com/'+y+'|')
+    with open('README.md','r+', encoding="utf-8") as f:
         current = f.read()
-        summary = dict()
-        table_rows = ['| Year | Stars | Advent of Code Link |\n','| :--: | :---: | :--: |\n']
-        badges = []
-        for year_overview in save['data']:
-            year = str(year_data['year'])
-            star_count = str(0) #year_data['solutions']
-            summary[year] = star_count
-        for entry in summary:
-            badges.append('[![AoC '+y+'](https://img.shields.io/badge/'+y+'-⭐%20'+y+'-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/'+y+')')
-            table_rows.append('| ['+y +']('+y+') | ⭐️'+star_count+' | https://adventofcode.com/'+y+'|\n')
+        current = re.sub(r'<!-- sum of stars 1: begin -->.*<!-- sum of stars 1: end -->', '<!-- sum of stars 1: begin -->(⭐ '+str(sum(summary.values()))+')<!-- sum of stars 1: end -->', current)
+        current = re.sub(r'(?s)<!-- Badges of stars: begin -->.*<!-- Badges of stars: end -->', '<!-- Badges of stars: begin -->\n'+'\n'.join(badges)+'\n<!-- Badges of stars: end -->', current)
+        current = re.sub(r'(?s)<!-- Table summary of years: begin -->.*<!-- Table summary of years: end -->', '<!-- Table summary of years: begin -->\n'+'\n'.join(table_rows)+'\n<!-- Table summary of years: end -->',current)
+        f.seek(0)
+        f.write(current)
+        f.truncate()
             
-        print(badges)
+        
 
 
 

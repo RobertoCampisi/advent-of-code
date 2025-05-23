@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from my_utils import tadd, tsub
 
 def parse_input():
-    with open('2024/input/day8.txt','r') as input_file:
+    with open('2024/input/day08.txt','r') as input_file:
         return  input_file.read().strip().split("\n")
 
 def in_bounds(a, w, h):
