@@ -5,8 +5,6 @@ import os
 import urllib.request
 import sys
 import time
-
-import subprocess
 from subprocess import Popen, PIPE, STDOUT
 
 #puzzle and solution states are stored in a JSON file
@@ -442,31 +440,20 @@ def benchmark(year, days, part, number):
         raise Exception('invalid argument')
     total_milliseconds = 0.0
     for day in days:
+        def run_benchmark(part,save_tag):
+            (out, err) = run_solution("python {}/day{:02d}.py benchmark {} {}".format(year, int(day), part, number))
+            print(err) if err else print("day {} {} took {} milliseconds".format(day, part, out))
+            if number >= 10: #treshold to store benchmark results
+                state['data'][year][day][save_tag] = out + ' ms'
+            return float(out) if not err else 0.0
         match part:
             case 0:
-                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_one {}".format(year, int(day), number))
-                print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
-                total_milliseconds += float(out) if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p1_prev_bench'] = out + ' ms'
-                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_two {}".format(year, int(day), number))
-                print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
-                total_milliseconds += float(out)  if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p2_prev_bench'] = out + ' ms'
-
+                total_milliseconds += run_benchmark('part_one','p1_bench')
+                total_milliseconds += run_benchmark('part_two','p2_bench')
             case 1:
-                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_one {}".format(year, int(day), number))
-                print(err) if err else print("day {} part_one took {} milliseconds".format(day, out))
-                total_milliseconds += float(out)  if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p1_prev_bench'] = out + ' ms'
+                total_milliseconds += run_benchmark('part_one','p1_bench')
             case 2:
-                (out, err) = run_solution("python {}/day{:02d}.py benchmark part_two {}".format(year, int(day), number))
-                print(err) if err else print("day {} part_two took {} milliseconds".format(day, out))
-                total_milliseconds += float(out)  if not err else 0.0
-                if number >= 10: #treshold to store benchmark results
-                    state['data'][year][day]['p2_prev_bench'] = out + ' ms'
+                total_milliseconds += run_benchmark('part_two','p2_bench')
             case _:
                 raise Exception('invalid arguments')
         if number >= 10:
