@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 #import my_util functions
 
 def parse_input():
-    with open('2023/input/day1.txt','r') as input_file:
+    with open('2023/input/day01.txt','r') as input_file:
         return input_file.read().split('\n')
 
 def to_int(match):
