@@ -24,7 +24,7 @@ star ⭐️ so the maximum amount of stars for a year is `50`.
 <!-- Table summary of years: begin -->
 | Year | Stars | Advent of Code Link |
 | :--: | :---: | :--: |
-| [2023](year/2015) | ⭐️16  | https://adventofcode.com/2015 |
+| [2015](year/2015) | ⭐️16  | https://adventofcode.com/2015 |
 | [2023](year/2023) | ⭐️26  | https://adventofcode.com/2023 |
 | [2024](year/2024) | ⭐️48  | https://adventofcode.com/2024 |
 <!-- Table summary of years: end -->
