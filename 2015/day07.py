@@ -28,79 +28,44 @@ def parse_input():
                     gate_queue.append(('ASSIGN', 0, [cand], t1))
         return gate_queue
 
-def part_one():
+def emulate(gate_queue):
     wires = dict()
     i = 0
-    gate_queue = parse_input()
-    #emulate
     while len(gate_queue) > 0:
         i = i % len(gate_queue)
-        opcode, literal, input, output = gate_queue[i]
-        if all(i in wires for i in input) or len(input) == 0:
+        opcode, literal, input_, output = gate_queue[i]
+        if all(i in wires for i in input_) or len(input_) == 0:
             match opcode:
                 case 'ASSIGN_LIT': wires[output] = literal
-                case 'ASSIGN': wires[output] = wires[input[0]]
-                case 'NOT': wires[output] = ~wires[input[0]]
-                case 'LSHIFT': wires[output] = wires[input[0]] << literal
-                case 'RSHIFT': wires[output] = wires[input[0]] >> literal
-                case 'AND': wires[output] = wires[input[0]] & wires[input[1]]
-                case 'OR': wires[output] = wires[input[0]] | wires[input[1]]
-                case 'AND_LIT': wires[output] = literal & wires[input[0]]
-                case 'OR_LIT': wires[output] = literal | wires[input[0]]
+                case 'ASSIGN': wires[output] = wires[input_[0]]
+                case 'NOT': wires[output] = ~wires[input_[0]]
+                case 'LSHIFT': wires[output] = wires[input_[0]] << literal
+                case 'RSHIFT': wires[output] = wires[input_[0]] >> literal
+                case 'AND': wires[output] = wires[input_[0]] & wires[input_[1]]
+                case 'OR': wires[output] = wires[input_[0]] | wires[input_[1]]
+                case 'AND_LIT': wires[output] = literal & wires[input_[0]]
+                case 'OR_LIT': wires[output] = literal | wires[input_[0]]
             gate_queue.pop(i)
         else:
             i += 1
+    return wires
+
+def part_one():
+    gate_queue = parse_input()
+    wires = emulate(gate_queue)
     print(wires['a'])
 
 def part_two():
-    wires = dict()
-    i = 0
     gate_queue = parse_input()
-    #emulate
-    while len(gate_queue) > 0:
-        i = i % len(gate_queue)
-        opcode, literal, input, output = gate_queue[i]
-        if all(i in wires for i in input) or len(input) == 0:
-            match opcode:
-                case 'ASSIGN_LIT': wires[output] = literal
-                case 'ASSIGN': wires[output] = wires[input[0]]
-                case 'NOT': wires[output] = ~wires[input[0]]
-                case 'LSHIFT': wires[output] = wires[input[0]] << literal
-                case 'RSHIFT': wires[output] = wires[input[0]] >> literal
-                case 'AND': wires[output] = wires[input[0]] & wires[input[1]]
-                case 'OR': wires[output] = wires[input[0]] | wires[input[1]]
-                case 'AND_LIT': wires[output] = literal & wires[input[0]]
-                case 'OR_LIT': wires[output] = literal | wires[input[0]]
-            gate_queue.pop(i)
-        else:
-            i += 1
+    wires = emulate(gate_queue)
     new_b = wires['a']
-    wires = dict()
-    i = 0
     gate_queue = parse_input()
     #overwrite wire b
     for i in range(len(gate_queue)):
-        opcode, literal, input, output = gate_queue[i]
+        opcode, literal, _, output = gate_queue[i]
         if opcode == 'ASSIGN_LIT' and output == 'b':
             gate_queue[i] = ('ASSIGN_LIT',new_b,[],output)
-    #emulate
-    while len(gate_queue) > 0:
-        i = i % len(gate_queue)
-        opcode, literal, input, output = gate_queue[i]
-        if all(i in wires for i in input) or len(input) == 0:
-            match opcode:
-                case 'ASSIGN_LIT': wires[output] = literal
-                case 'ASSIGN': wires[output] = wires[input[0]]
-                case 'NOT': wires[output] = ~wires[input[0]]
-                case 'LSHIFT': wires[output] = wires[input[0]] << literal
-                case 'RSHIFT': wires[output] = wires[input[0]] >> literal
-                case 'AND': wires[output] = wires[input[0]] & wires[input[1]]
-                case 'OR': wires[output] = wires[input[0]] | wires[input[1]]
-                case 'AND_LIT': wires[output] = literal & wires[input[0]]
-                case 'OR_LIT': wires[output] = literal | wires[input[0]]
-            gate_queue.pop(i)
-        else:
-            i += 1
+    wires = emulate(gate_queue)
     print(wires['a'])
 
 
