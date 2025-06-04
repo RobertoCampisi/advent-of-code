@@ -32,7 +32,6 @@ def part_two():
             replacements_T[r] += [k]
     molecules = set([''.join(molecule)])
     steps = 0
-    print(replacements_T)
     for _ in range(1000):
         next_molecules = set()
         for m in molecules:
