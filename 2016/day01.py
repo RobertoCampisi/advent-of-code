@@ -14,47 +14,29 @@ def part_one():
     for ins in instructions:
         if ins.startswith('R'):
             direction *= -1j
-            position += direction * int(ins[1:])
         elif ins.startswith('L'):
             direction *= 1j
-            position += direction * int(ins[1:])
+        position += direction * int(ins[1:])
     print(abs(int(position.real)) + abs(int(position.imag)))
-
-def on_segment(p, q, r):
-    return (q.real <= max(p.real, r.real) and q.real >= min(p.real, r.real) and 
-            q.imag <= max(p.imag, r.imag) and q.imag >= min(p.imag, r.imag))
-
-def orient(p, q, r):
-    val = (q.imag - p.imag) * (r.real - q.real) - \
-          (q.real - p.real) * (r.imag - q.imag)
-    if val == 0: return 0
-    return 1 if val > 0 else 2 
-
-def intersect(ls1, ls2):
-    o1 = orient(ls1[0], ls1[1], ls2[0])
-    o2 = orient(ls1[0], ls1[1], ls2[1])
-    o3 = orient(ls2[0], ls2[1], ls1[0])
-    o4 = orient(ls2[0], ls2[1], ls1[1])
-    return o1 != o2 and o3 != o4
 
 def part_two():
     instructions = parse_input()
     position = 0 #start
     direction = 1j #north
-    visited_lines = set()
+    visited = set()
+    found_duplicate = False
     for ins in instructions:
         if ins.startswith('R'):
             direction *= -1j
-            new_position = position + direction * int(ins[1:])
         elif ins.startswith('L'):
             direction *= 1j
-            new_position = position + direction * int(ins[1:])
-        if any([intersect((position,new_position), l) for l in visited_lines]):
-            print(visited_lines, ins ,(position, new_position))
-            break
-        else:
-            visited_lines.add((position, new_position))
-        position = new_position
+        for x in range(int(ins[1:])):
+            position += direction
+            if position in visited:
+                found_duplicate = True
+                break
+            visited.add(position)
+        if found_duplicate: break
     print(abs(int(position.real)) + abs(int(position.imag)))
 
 #simple benchmark function.
