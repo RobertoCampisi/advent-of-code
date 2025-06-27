@@ -1,4 +1,4 @@
-# 🎄 Advent of Code Solutions <!-- sum of stars 1: begin -->(⭐ 90)<!-- sum of stars 1: end --> 🎄
+# 🎄 Advent of Code Solutions <!-- sum of stars 1: begin -->(⭐ 132)<!-- sum of stars 1: end --> 🎄
 
 [![Advent of Code](https://img.shields.io/badge/Advent%20of%20Code-ffff66?logo=adventofcode&logoColor=000)](<https://adventofcode.com/> "Advent of Code homepage")
 [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](<https://python.org> "Go to Python homepage")
@@ -10,7 +10,8 @@ Currently I am working on making an command line interface to facilitate comunic
 
 ---
 <!-- Badges of stars: start -->
-[![AoC 2023](https://img.shields.io/badge/2015-⭐%2016-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2023)
+[![AoC 2015](https://img.shields.io/badge/2015-⭐%2050-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2015)
+[![AoC 2016](https://img.shields.io/badge/2016-⭐%208-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2016)
 [![AoC 2023](https://img.shields.io/badge/2023-⭐%2026-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2023)
 [![AoC 2024](https://img.shields.io/badge/2024-⭐%2048-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2024)  
 <!-- Badges of stars: end -->
@@ -24,7 +25,8 @@ star ⭐️ so the maximum amount of stars for a year is `50`.
 <!-- Table summary of years: begin -->
 | Year | Stars | Advent of Code Link |
 | :--: | :---: | :--: |
-| [2015](year/2015) | ⭐️16  | https://adventofcode.com/2015 |
+| [2015](year/2015) | ⭐️50  | https://adventofcode.com/2015 |
+| [2016](year/2016) | ⭐️8  | https://adventofcode.com/2016 |
 | [2023](year/2023) | ⭐️26  | https://adventofcode.com/2023 |
 | [2024](year/2024) | ⭐️48  | https://adventofcode.com/2024 |
 <!-- Table summary of years: end -->
