@@ -5,13 +5,20 @@ import os
 import urllib.request
 import sys
 import time
+from aocext import init_console
+from aocext import aoc_print
 from subprocess import Popen, PIPE, STDOUT
 
 #puzzle and solution states are stored in a JSON file
 SAVEFILE_NAME = "save.json"
 state = {'token': '', 'data': {}}
 
+#optinal RICH console, initinalized with aocext
+console = init_console()
 
+"""
+My personal Advent of Code Command Line Interface tool
+"""
 class AoCCLI(cmd.Cmd):
     prompt = '>>'
     intro = 'Advent of Code command line interface. Type "help" for available commands.'
@@ -34,14 +41,14 @@ class AoCCLI(cmd.Cmd):
         """
         try:
             fetch(*parse(arg))
-            print('fetch puzzle input from Advent of Code')
+            aoc_print('fetch puzzle input from Advent of Code')
         except Exception as e:
-            print('Failed to fetch puzzle input: ', e)
+            aoc_print('Failed to fetch puzzle input: ', e)
 
     def do_token(self, arg):
         """Stores or shows the token (session cookie) for authorisation to the Advent of Code website"""
         if arg == '':
-            print('token:', state['token'])
+            aoc_print(console, 'token:', state['token'])
         else:
             state['token'] = arg
         save() 
@@ -111,7 +118,6 @@ class AoCCLI(cmd.Cmd):
         save()
     
     def postcmd(self, stop, line):
-        print()  # Add an empty line for better readability
         return stop
 
 def save():
@@ -266,7 +272,10 @@ def fetch(year, days, part, number):
                     html = response.read().decode("utf-8")
                     if 'Puzzle inputs differ by user. Please log in to get your puzzle input.' not in html:
                         f = open('{}/input/day{:02d}.txt'.format(year, int(day)), "w")
-                        f.write(html[:-1])#ignore new_line character at the end
+                        if html[-1] == '\n': #ignore new_line character at the end
+                            f.write(html[:-1]) 
+                        else:
+                            f.write(html) 
                     else:
                         raise ValueError("Received bad response")
                 else:
