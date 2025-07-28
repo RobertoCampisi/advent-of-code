@@ -5,8 +5,9 @@
 ![Last commit](https://img.shields.io/github/last-commit/Flizz95/advent-of-code "Last commit")
 
 # advent-of-code
-My personal solutions written in python for the yearly Advent of Code coding challenges of the year 2024 and partly of 2023.
-Currently I am working on making an command line interface to facilitate comunication with the advent of code website and automatation, such as testing and benchmarking, for future solutions. 
+
+This repository contains my personal solutions written in python for the yearly Advent of Code coding challenges.
+Currently I am working on making an command line interface (CLI) to facilitate intergration with the advent of code website and automatation, such as testing and benchmarking, for future solution. 
 
 ---
 <!-- Badges of stars: start -->
@@ -16,6 +17,11 @@ Currently I am working on making an command line interface to facilitate comunic
 [![AoC 2024](https://img.shields.io/badge/2024-⭐%2048-gray?logo=adventofcode&labelColor=8a2be2)](https://adventofcode.com/2024)  
 <!-- Badges of stars: end -->
 ---
+
+## CLI (Work in progress)
+
+The CLI can be accessed by executing `aoc.py` with python.
+
 
 ## 🎄 Stats
 
