@@ -64,7 +64,10 @@ def part_one():
                 screen.rotate_row(ins[1], ins[2])
             case 'column': 
                 screen.rotate_column(ins[1], ins[2])
+        #debug statements
+        print(ins) 
         print(screen)
+        print(screen.pixels_lit()) 
     print(screen.pixels_lit())
 
 def part_two():
