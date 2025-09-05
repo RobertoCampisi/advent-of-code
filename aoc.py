@@ -88,8 +88,11 @@ class AoCCLI(cmd.Cmd):
             print('Failed to update README: ', e) 
     
     def do_scan(self, arg):
-        """Does a scan to given directory and adds all unkown puzzles solutions and tests to JSON file"""
-        print("WIP!")
+        """Does a scan in the directory for a spesific file structure and adds entries of all found puzzles solutions to JSON file"""
+        try:
+            scan_directory()
+        except Exception as e:
+            print('Failed to scan current directory', e)
 
     def do_parse(self, line):
         """method to Test current parse function"""
@@ -459,6 +462,36 @@ def benchmark(year, days, part, number):
         if number >= 10:
             save()
     print("total average time taken: {} milliseconds".format(total_milliseconds))
+
+def scan_directory():
+    with os.scandir('.') as year_iter: #os scan to look for year folders
+        solution_counter = 0
+        for year_cand in year_iter:
+            if not year_cand.name.startswith('.') and year_cand.is_dir():
+                #look for valid years
+                #TODO replace this with the 'valid_year_function' once parse() has modularised
+                res = re.fullmatch(r'(\d{4})', year_cand.name)
+                if res is not None:
+                    cand = int(res.group(1))
+                    if 2015 <= cand <= 2024:
+                        year = res.group(1)
+                        if year not in state['data']: #unknown year
+                            state['data'][year] = {}
+                        print('looking for solutions in folder {}...'.format(year))
+                        with os.scandir('.\\{}\\'.format(year)) as day_iter: #os scan to look for solutions
+                            for day_cand in day_iter:
+                                if day_cand.name.startswith('day') and day_cand.is_file():
+                                    try:
+                                        day = int(day_cand.name[3:-3])
+                                        if 1 <= day <= 25:
+                                            if day not in state['data'][year]:
+                                                state['data'][year][day] = {'answer_p1': None, 'answer_p2': None}
+                                            solution_counter += 1
+                                    except ValueError as e:
+                                        pass #ignore these for now
+                            save()
+        print('found a total of {} solutions.'.format(solution_counter))                            
+        
 
 
 #README.md contains gold stars (total count of ans_part1 and ans_part2) 
