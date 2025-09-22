@@ -21,7 +21,37 @@ Currently I am working on making an command line interface (CLI) to facilitate i
 
 ## CLI (Work in progress)
 
-The CLI can be accessed by executing `aoc.py` with python.
+Since the tool is made for first personal use, it has been written to run in the same directory as the solutions.
+
+It assumes the following file structure for any solution:
+```{YEAR}/day{DAY}.py```
+Where `YEAR` is four digit number for the year of the advent of code puzzles and `DAY` a two digit number for the day (example: 01,02,..,25).
+
+The CLI can be started by executing `aoc.py` with python.
+
+### Arguments
+
+`{year}` - 4 digits for the year. This is an optional argument and defaults to the last Advent of code challenge, when left out.
+`[day(s)]` -
+`{part}` -
+
+### Commands
+
+`token` - Set or get the current session token for advent of code website
+
+`scan` - Scans the directory for the assumed file structure to find existing solutions and add their entries to the savefile
+
+`create` {year} [day(s)] - Creates an entry in the savefile for the given day(s)
+
+`fetch` {year} [day(s)] - Fetches and stores the personal input data from advent of code for the given day(s)
+
+`run` {year} [day(s)] {part} - Run the given solution(s) with the fetch input data and display its output
+
+`submit` {year} [day(s)] {part} - Run the given solution(s) and automatically submits the result to advent of code
+
+`benchmark` {year} [day(s)] {part} [n] - run the given solution [n] times and return and store the average time. 
+
+`quit` - Closes the CLI
 
 
 ## 🎄 Stats
