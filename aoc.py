@@ -269,7 +269,7 @@ def fetch(year, days, part, number):
                     html = response.read().decode("utf-8")
                     if 'Puzzle inputs differ by user. Please log in to get your puzzle input.' not in html:
                         f = open('{}/input/day{:02d}.txt'.format(year, int(day)), "w")
-                        f.write(html[:-1])#ignore new_line character at the end
+                        f.write(html.rstrip())#ignore new_line character at the end
                     else:
                         raise ValueError("Received bad response")
                 else:
