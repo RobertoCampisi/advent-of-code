@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE, STDOUT
 
 #puzzle and solution states are stored in a JSON file
 SAVEFILE_NAME = "save.json"
-state = {'token': '', 'data': {}}
+state = {'token': '','year':'auto', 'data': {}}
 
 
 class AoCCLI(cmd.Cmd):
@@ -44,7 +44,20 @@ class AoCCLI(cmd.Cmd):
             print('token:', state['token'])
         else:
             state['token'] = arg
-        save() 
+        save()
+
+    def do_year(self, arg):
+        """Sets or gets the global year setting. Defaulted to 'auto'"""
+        if arg == '':
+            print('year:', state['year'])
+        else:
+            if arg == 'auto':
+                state['year'] = arg
+                save()  
+            #validate
+            elif 2015 <= int(arg) <= int(last_aoc_year()):
+              state['year'] = arg
+              save()  
     
     def do_test(self, arg):
         """Test puzzle on added examples and compare the outputs to the expected results"""
@@ -126,7 +139,7 @@ def parse_year(year_arg):
     res = re.fullmatch(r'(\d{4})', year_arg)
     if res is not None:
         cand = int(res.group(1))
-        if 2015 <= cand <= 2024: #automate upperbound
+        if 2015 <= cand <= int(last_aoc_year()):
             return res.group(1)
         else:
             raise Exception('{} is an invalid year'.format(cand))
@@ -162,7 +175,25 @@ def parse_days(days_arg):
                 else:
                    raise Exception('invalid day given')
     return days
-          
+
+def default_year():
+    if state['year'] == 'auto':
+        return last_aoc_year()
+    else:
+        return state['year']
+
+def last_aoc_year():
+    #hardcoded stop in the case AoC ever stops with making more puzzles
+    last_year = ''
+    if not last_year:
+        now = time.gmtime()
+        if now[1] == 12:
+            return str(now[0])
+        else:
+            return str(now[0] - 1)
+    else:
+        return last_year
+
 #TODO simplify and unspaghettify the function even further
 def parse(args):
     """
@@ -171,7 +202,7 @@ def parse(args):
     part_one_patterns = [r'one',r'p[\-_=]{0,1}1',r'part[\-_=]{0,1}one',r'part[\-_=]{0,1}1']
     part_two_patterns = [r'two',r'p[\-_=]{0,1}2',r'part[\-_=]{0,1}two',r'part[\-_=]{0,1}2']
     number_option_patterns = [r'n[\-_=]{0,1}(\d+)'] #additional integer used for some functions
-    year = '2024' #default year #TODO: automate this, default year updates every end of november
+    year = default_year() #default year #TODO: automate this, default year updates every end of november
     days = []
     part = 0 #default
     number = None #no defined default
