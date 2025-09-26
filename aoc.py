@@ -121,10 +121,52 @@ def save():
     with open(SAVEFILE_NAME, 'w') as savefile:
             json.dump(state, savefile, indent=2)
 
-#TODO simplify and unspaghettify the function
+#function to parse and validate an expected year argument
+def parse_year(year_arg):
+    res = re.fullmatch(r'(\d{4})', year_arg)
+    if res is not None:
+        cand = int(res.group(1))
+        if 2015 <= cand <= 2024: #automate upperbound
+            return res.group(1)
+        else:
+            raise Exception('{} is an invalid year'.format(cand))
+    else:
+        raise Exception('{} is an invalid year'.format(year_arg))
+
+#function to parse and validate an days argument
+def parse_days(days_arg):
+    days = []
+    for d in days_arg:
+        res = re.fullmatch(r'all', d)
+        if res is not None:
+            for i in range(1, 26):
+                days.append(str(i))
+        else: 
+            res = re.fullmatch(r'(\d+)\-(\d+)', d)
+            if res is not None:
+                cand1 = int(res.group(1))
+                cand2 = int(res.group(2))
+                if 0 < cand1 <= 25 and 0 < cand2 <= 25:
+                    for i in range(cand1, cand2+1):
+                        days.append(str(i))
+                else:
+                   raise Exception('invalid day in '+res.group(0))
+            else:
+                res = re.fullmatch(r'(\d+)', d)
+                if res is not None:
+                    cand = int(res.group(1))
+                    if 0 < cand <= 25:
+                        days.append(res.group(1))
+                    else:
+                        raise Exception('invalid day given')
+                else:
+                   raise Exception('invalid day given')
+    return days
+          
+#TODO simplify and unspaghettify the function even further
 def parse(args):
     """
-    parse for most commands.
+    parse and validate provided arguments
     """
     part_one_patterns = [r'one',r'p[\-_=]{0,1}1',r'part[\-_=]{0,1}one',r'part[\-_=]{0,1}1']
     part_two_patterns = [r'two',r'p[\-_=]{0,1}2',r'part[\-_=]{0,1}two',r'part[\-_=]{0,1}2']
@@ -133,8 +175,9 @@ def parse(args):
     days = []
     part = 0 #default
     number = None #no defined default
-    year_str = ''
-    day_str = ''
+    year_arg = ''
+    days_arg = ''
+    #optional arguments
     #check for part 1 argument
     for pttrn in part_one_patterns:
         m = re.search(pttrn, args, re.IGNORECASE)
@@ -159,67 +202,32 @@ def parse(args):
                 number = int(m[1])
             else:
                 raise Exception('invalid arguments')
+    
+    #determine if the first argument is a year or day argument
     temp = args.split(' ')
-    if len(temp) == 1 and part == 0 and number is None:
-        day_str = temp[0]
-    elif len(temp) == 1 and (part != 0 or number is not None):
+    if len(temp) == 1 and (part != 0 or number is not None):
         raise Exception('required argument for day missing')
-    elif len(temp) == 2 and (part != 0 or number is not None):
-        day_str = temp[0]
-    elif len(temp) == 3 and part != 0 and number is not None:
-        day_str = temp[0]
-    elif len(temp) == 2 and part == 0 and number is None:
-        year_str, day_str = temp[0:2]
-    elif len(temp) == 3 and part == 0 and number is not None:
-        year_str, day_str = temp[0:2]
-    elif len(temp) == 3 and part != 0 and number is None:
-        year_str, day_str = temp[0:2]
+    elif any([len(temp) == 1 and part == 0 and number is None,
+              len(temp) == 2 and (part != 0 or number is not None),
+              len(temp) == 3 and part != 0 and number is not None]):
+        days_arg = temp[0] 
+    elif any([len(temp) == 2 and part == 0 and number is None, 
+              len(temp) == 3 and part == 0 and number is not None,
+              len(temp) == 3 and part != 0 and number is None,
+              len(temp) == 4 and part != 0 and number is not None]):
+        year_arg, days_arg = temp[0:2]
     elif len(temp) == 3 and part == 0 and number is None:
         raise Exception('too many arguments provided or unclear defined part.')
-    elif len(temp) == 4 and part != 0 and number is not None:
-        year_str, day_str = temp[0:2]
     else:
         raise Exception('incorrect number of arguments provided')
-    #year validation
-    if year_str != '':
-        res = re.fullmatch(r'(\d{4})', year_str)
-        if res is not None:
-            cand = int(res.group(1))
-            if 2015 <= cand <= 2024:
-                year = res.group(1)
-            else:
-                raise Exception('{} is an invalid year'.format(cand))
-        else:
-            raise Exception('{} is an invalid year'.format(year_str))
-    day_str = day_str.split(',') 
-     #check empty days
-    if not day_str:
-        raise Exception('no day given')
-    for d in day_str:
-        res = re.fullmatch(r'all', d)
-        if res is not None:
-            for i in range(1, 26):
-                days.append(i)
-        else: 
-            res = re.fullmatch(r'(\d+)\-(\d+)', d)
-            if res is not None:
-                cand1 = int(res.group(1))
-                cand2 = int(res.group(2))
-                if 0 < cand1 <= 25 and 0 < cand2 <= 25:
-                    for i in range(cand1, cand2+1):
-                        days.append(str(i))
-                else:
-                   raise Exception('invalid day in '+res.group(0))
-            else:
-                res = re.fullmatch(r'(\d+)', d)
-                if res is not None:
-                    cand = int(res.group(1))
-                    if 0 < cand <= 25:
-                        days.append(res.group(1))
-                    else:
-                        raise Exception('invalid day given')
-                else:
-                   raise Exception('invalid day given')
+    #parse year, if year argument is given
+    if year_arg != '':
+        year = parse_year(year_arg)
+    #parse and validate the required days argument 
+    days_arg = days_arg.split(',') 
+    if not days_arg:
+        raise Exception('no day provided')
+    days = parse_days(days_arg)
     return year,days,part,number
 
 def create(year, days, part, number):
@@ -277,7 +285,7 @@ def fetch(year, days, part, number):
         time.sleep(1)#we do not want to spam the website, when fetching input data in bulk
         
 
-def test(year, days):
+def test(year, days, part, number):
     if year not in state['data']: #unknown year
         raise Exception("unknown year")
     print("WIP!")
