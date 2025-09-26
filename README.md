@@ -21,7 +21,7 @@ Currently I am working on making an command line interface (CLI) to facilitate i
 
 ## CLI (Work in progress)
 
-Since the tool is made for first personal use, it has been written to run in the same directory as the solutions.
+Since the tool is made for first personal use, I decided to keep it simple. The CLI has been written to run in the same directory as the solutions.
 
 It assumes the following file structure for any solution:
 ```{YEAR}/day{DAY}.py```
