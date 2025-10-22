@@ -14,20 +14,34 @@ def part_one():
     for i in range(max_count):
         if not tuple(mem_banks) in seen.keys():
             seen[tuple(mem_banks)] = i
-            index = max(reversed(range(len(mem_banks))), key=lambda x: mem_banks[x])
+            index = max(range(len(mem_banks)), key=lambda x: mem_banks[x])
             blocks, mem_banks[index] = mem_banks[index], 0
             while blocks > 0:
                 index = (index + 1) % len(mem_banks)
                 mem_banks[index] += 1
                 blocks -= 1
         else:
-            print(seen[tuple(mem_banks)])
+            print(i)
             break
 
     
 
 def part_two():
-    ...
+    mem_banks = parse_input()
+    max_count = 100000
+    seen = dict()
+    for i in range(max_count):
+        if not tuple(mem_banks) in seen.keys():
+            seen[tuple(mem_banks)] = i
+            index = max(range(len(mem_banks)), key=lambda x: mem_banks[x])
+            blocks, mem_banks[index] = mem_banks[index], 0
+            while blocks > 0:
+                index = (index + 1) % len(mem_banks)
+                mem_banks[index] += 1
+                blocks -= 1
+        else:
+            print(i - seen[tuple(mem_banks)])
+            break
 
 #simple benchmark function.
 def benchmark(func, n):
