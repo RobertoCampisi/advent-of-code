@@ -56,15 +56,21 @@ def part_two():
       get_weight_subtree(root)
       #find imbalance
       current = root
+      target_weight = 0
       for i in range(100):
-          w = None
+          ws = defaultdict(lambda: 0)
           for child in children[current]:
-            if w is None: 
-                w = total_weights[child]
-            if w != total_weights[child]:
-                print('imbalance found.', child, ' of ', current)
-                current = child
-    
+              ws[total_weights[child]] += 1
+          next_target_weight = list(filter(lambda x: x[1] > 1, ws.items()))[0][0]
+          imbalance_weight = list(filter(lambda x: x[1] == 1, ws.items())) 
+          if imbalance_weight:
+              for child in children[current]:
+                  if total_weights[child] == imbalance_weight[0][0]:
+                    current = child 
+                    target_weight = next_target_weight
+          else:
+              print(target_weight - total_weights[current] + individual_weights[current])
+              break
 
 #simple benchmark function.
 def benchmark(func, n):
