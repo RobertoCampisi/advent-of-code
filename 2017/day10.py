@@ -26,8 +26,7 @@ def part_one():
     print(circular_list[0] * circular_list[1])
 
 def part_two():
-    lengths = [ord(c) for c in "1,2,3"]
-    print(lengths)
+    lengths = [ord(c) for c in parse_input()] + [17, 31, 73, 47, 23]
     circular_list = list(range(256))
     selector = 0
     skip_size = 0
@@ -44,20 +43,13 @@ def part_two():
               end_swap-=1
           selector = (selector + length + skip_size) % len(circular_list)
           skip_size += 1
-    #compute dense, something is going wrong here, Since empty string does not give the right result
-    dense = circular_list[:16]
-    for i in range(1,16): 
-        for j in range(16):
-            dense[j] ^= circular_list[i*16+j]
-    print(dense)
-    def hexify(n):
-        hex_digits = [str(x) for x in range(10)] + ['a','b','c','d','e','f']
-        d1 = n // 16
-        d2 = n % 16
-        return hex_digits[d1] + hex_digits[d2]
-
-    hex_string = ''.join([hexify(x) for x in dense])
-    print(hex_string)
+    dense = []
+    for i in range(0,16):
+        d =  circular_list[i*16]
+        for j in range(1,16):
+            d ^= circular_list[i*16+j]
+        dense.append(d)
+    print(''.join([f'{d:02x}' for d in dense]))
 
 
 #simple benchmark function.
